@@ -20,6 +20,14 @@
     ((:file "db/db")
      (:file "image")))
 
+   (:file "stream")
+
+   (:module :fs
+    :pathname "fs"
+    :components
+    ((:file "retrieve")
+     (:file "thumbnail")))
+
    (:file "album/contents/db/mito")
    (:file "album/db/mito")
    (:file "image/db/mito"))
