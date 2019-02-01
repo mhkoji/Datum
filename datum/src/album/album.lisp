@@ -8,7 +8,6 @@
            :make-contents-appending
            :append-album-contents
 
-           :make-album
            :make-source
            :save-albums
 
@@ -42,26 +41,6 @@
 
 
 ;;; Album CRUD
-(defstruct source name thumbnail)
-
-(defun create-albums (id-generator sources)
-  (let ((album-ids (mapcar (lambda (source)
-                             (datum.id:gen id-generator
-                                           (source-name source)))
-                           sources)))
-    (mapcar (lambda (album-id source)
-              (datum.album.repository:make-album
-               :id album-id
-               :name (source-name source)
-               :updated-at (get-universal-time)
-               :thumbnail (source-thumbnail source)))
-            album-ids sources)))
-
-(defun save-albums (sources db id-generator)
-  (let ((albums (create-albums id-generator sources)))
-    (datum.album.repository:save-albums db albums)))
-
-
 (defstruct loader db thumbnail-repository)
 
 (defun load-albums-by-ids (loader ids)
@@ -81,3 +60,25 @@
   (datum.album.repository:delete-albums db album-ids)
   (datum.album.contents:delete-by-album-ids db content-repository
                                             album-ids))
+
+
+(defstruct source name thumbnail updated-at)
+
+(defun create-albums (id-generator sources)
+  (let ((album-ids (mapcar (lambda (source)
+                             (datum.id:gen id-generator
+                                           (source-name source)))
+                           sources)))
+    (mapcar (lambda (album-id source)
+              (datum.album.repository:make-album
+               :id album-id
+               :name (source-name source)
+               :updated-at (source-updated-at source)
+               :thumbnail (source-thumbnail source)))
+            album-ids sources)))
+
+(defun save-albums (sources db id-generator)
+  (let ((albums (create-albums id-generator sources)))
+    ;; Delete existing albums if any
+    (datum.album.repository:delete-albums db (mapcar #'album-id albums))
+    (datum.album.repository:save-albums db albums)))
