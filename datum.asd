@@ -7,7 +7,7 @@
    (:module :album
     :pathname "album"
     :components
-    ((:file "contents/db")
+    ((:file "contents/db/db")
      (:file "contents/contents")
      (:file "thumbnail/thumbnail")
      (:file "db/db")
