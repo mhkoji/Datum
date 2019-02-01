@@ -1,10 +1,5 @@
 (defpackage :datum.album
   (:use :cl)
-  (:import-from :datum.album.repository
-                :album
-                :album-id
-                :album-name
-                :album-thumbnail)
   (:export :album-id
            :album-name
            :album-thumbnail
@@ -21,7 +16,12 @@
            :laod-albums-by-ids
            :load-albums-by-range
 
-           :delete-albums))
+           :delete-albums)
+  (:import-from :datum.album.repository
+                :album
+                :album-id
+                :album-name
+                :album-thumbnail))
 (in-package :datum.album)
 
 ;;; Contents
@@ -70,10 +70,10 @@
    ids
    (loader-thumbnail-repository loader)))
 
-(defun load-albums-by-range (loader offset size)
+(defun load-albums-by-range (loader offset count)
   (datum.album.repository:load-albums
    (loader-db loader)
-   (datum.album.db:select-album-ids (loader-db loader) offset size)
+   (datum.album.db:select-album-ids (loader-db loader) offset count)
    (loader-thumbnail-repository loader)))
 
 

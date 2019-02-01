@@ -22,9 +22,9 @@
   name
   updated-at)
 
-(defgeneric insert-album-rows (db albums))
+(defgeneric insert-album-rows (db rows))
 (defgeneric select-album-rows (db album-ids))
-(defgeneric select-album-ids (db offset limit))
+(defgeneric select-album-ids (db offset count))
 (defgeneric delete-album-rows (db album-ids))
 
 
@@ -32,6 +32,6 @@
   album-id
   thumbnail-id)
 
-(defgeneric insert-album-thumbnail-rows (db thumbnail))
+(defgeneric insert-album-thumbnail-rows (db rows))
 (defgeneric select-album-thumbnail-rows (db album-ids))
 (defgeneric delete-album-thumbnail-rows (db album-ids))

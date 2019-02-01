@@ -12,7 +12,18 @@
      (:file "thumbnail/thumbnail")
      (:file "db/db")
      (:file "repository")
-     (:file "album"))))
+     (:file "album")))
+
+   (:module :image
+    :pathname "image"
+    :components
+    ((:file "db/db")
+     (:file "image")))
+
+   (:file "album/contents/db/mito")
+   (:file "album/db/mito")
+   (:file "image/db/mito"))
 
   :depends-on (:babel
-               :ironclad))
+               :ironclad
+               :mito))

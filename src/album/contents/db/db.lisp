@@ -1,12 +1,12 @@
 (defpackage :datum.album.contents.db
   (:use :cl)
-  (:export :save-contents
-           :load-contents
+  (:export :insert-contents
+           :select-contents
            :delete-contents))
 (in-package :datum.album.contents.db)
 
-(defgeneric save-contents (db album-id content-ids))
+(defgeneric insert-contents (db album-id content-ids))
 
-(defgeneric load-contents (db album-id))
+(defgeneric select-contents (db album-ids))
 
-(defgeneric delete-contents (db album-id))
+(defgeneric delete-contents (db album-ids))

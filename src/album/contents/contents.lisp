@@ -17,17 +17,19 @@
 (defgeneric album-id (album))
 
 (defun load-by-album (db content-repository album)
-  (let ((content-ids (datum.album.contents.db:load-contents
+  (let ((content-ids (datum.album.contents.db:select-contents
                       db (list (album-id album)))))
     (load-by-ids content-repository content-ids)))
 
 
 (defun delete-by-album-ids (db content-repository album-ids)
-  (let ((content-ids (datum.album.contents.db:load-contents db album-ids)))
-    (delete-by-ids content-repository content-ids)))
+  (let ((content-ids (datum.album.contents.db:select-contents
+                      db album-ids)))
+    (delete-by-ids content-repository content-ids))
+  (datum.album.contents.db:delete-contents db album-ids))
 
 
 (defun append-to-album (db album contents)
   (let ((album-id (album-id album))
         (content-ids (mapcar #'content-id contents)))
-    (datum.album.contents.db:save-contents db album-id content-ids)))
+    (datum.album.contents.db:insert-contents db album-id content-ids)))

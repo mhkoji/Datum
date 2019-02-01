@@ -1,32 +1,31 @@
 (defpackage :datum.image
   (:use :cl)
-  (:shadow :delete)
-  (:export :select
-           :insert
-           :delete
-           :make-image
+  (:export :image
            :image-id
            :image-path
+
            :save-images
-           :load-by-ids
-           :delete-by-ids))
+           :load-images-by-ids
+           :delete-images))
 (in-package :datum.image)
 
-(defstruct image id path)
+(defun create-images (id-generator paths)
+  (let ((image-ids (mapcar (lambda (path)
+                             (datum.id:gen id-generator path))
+                           paths)))
+    (mapcar (lambda (id path)
+              (datum.image.db:make-image :id id :path path))
+            image-ids paths)))
+
+(defun save-images (paths db id-generator)
+  (let ((images (create-images id-generator paths)))
+    (datum.image.db:insert-images db images))
+  (values))
 
 
-(defgeneric select (db ids))
+(defun load-images-by-ids (db image-ids)
+  (datum.image.db:select-images db image-ids))
 
-(defgeneric insert (db images))
-
-(defgeneric delete (db ids))
-
-
-(defun save-images (db images)
-  (insert db images))
-
-(defun load-by-ids (db ids)
-  (select db ids))
-
-(defun delete-by-ids (db ids)
-  (delete db ids))
+(defun delete-images (db image-ids)
+  (datum.image.db:delete-images db image-ids)
+  (values))
