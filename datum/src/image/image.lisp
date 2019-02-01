@@ -4,9 +4,15 @@
            :image-id
            :image-path
 
+           :repository
+           :make-repository
            :save-images
            :load-images-by-ids
-           :delete-images))
+           :delete-images)
+  (:import-from :datum.image.db
+                :image
+                :image-id
+                :image-path))
 (in-package :datum.image)
 
 (defun create-images (id-generator paths)
@@ -17,15 +23,18 @@
               (datum.image.db:make-image :id id :path path))
             image-ids paths)))
 
-(defun save-images (paths db id-generator)
+
+(defstruct repository db)
+
+(defun save-images (paths repos id-generator)
   (let ((images (create-images id-generator paths)))
-    (datum.image.db:insert-images db images))
+    (datum.image.db:insert-images (repository-db repos) images))
   (values))
 
 
-(defun load-images-by-ids (db image-ids)
-  (datum.image.db:select-images db image-ids))
+(defun load-images-by-ids (repos image-ids)
+  (datum.image.db:select-images (repository-db repos) image-ids))
 
-(defun delete-images (db image-ids)
-  (datum.image.db:delete-images db image-ids)
+(defun delete-images (repos image-ids)
+  (datum.image.db:delete-images (repository-db repos) image-ids)
   (values))

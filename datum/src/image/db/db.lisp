@@ -1,6 +1,7 @@
 (defpackage :datum.image.db
   (:use :cl)
   (:export :make-image
+           :image
            :image-id
            :image-path
 

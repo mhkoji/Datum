@@ -9,6 +9,7 @@
            :append-album-contents
 
            :make-source
+           :create-albums
            :save-albums
 
            :make-loader
@@ -56,10 +57,9 @@
    (loader-thumbnail-repository loader)))
 
 
-(defun delete-albums (album-ids db content-repository)
-  (datum.album.repository:delete-albums db album-ids)
-  (datum.album.contents:delete-by-album-ids db content-repository
-                                            album-ids))
+(defun delete-albums (db content-repository album-ids)
+  (datum.album.contents:delete-by-album-ids db content-repository album-ids)
+  (datum.album.repository:delete-albums db album-ids))
 
 
 (defstruct source name thumbnail updated-at)
@@ -77,8 +77,6 @@
                :thumbnail (source-thumbnail source)))
             album-ids sources)))
 
-(defun save-albums (sources db id-generator)
-  (let ((albums (create-albums id-generator sources)))
-    ;; Delete existing albums if any
-    (datum.album.repository:delete-albums db (mapcar #'album-id albums))
-    (datum.album.repository:save-albums db albums)))
+
+(defun save-albums (db albums)
+  (datum.album.repository:save-albums db albums))
