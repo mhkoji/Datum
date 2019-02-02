@@ -7,8 +7,8 @@
    (:module :album
     :pathname "album"
     :components
-    ((:file "contents/db/db")
-     (:file "contents/contents")
+    ((:file "pictures/db/db")
+     (:file "pictures/pictures")
      (:file "thumbnail/thumbnail")
      (:file "db/db")
      (:file "repository")
@@ -28,9 +28,9 @@
     ((:file "retrieve")
      (:file "thumbnail")))
 
-   (:file "album/contents/entities")
+   (:file "album/pictures/entities")
 
-   (:file "album/contents/db/mito")
+   (:file "album/pictures/db/mito")
    (:file "album/db/mito")
    (:file "image/db/mito"))
 

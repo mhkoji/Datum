@@ -43,13 +43,13 @@
         (delete-albums db image-repos (mapcar #'album-id albums))
         ;; Save albums
         (save-albums db albums)
-        ;; append contents
+        ;; Append pictures
         (let ((appendings
                (loop for dir in dirs
                      for album in albums
                      for entities = (let ((paths (dir-file-paths dir)))
                                       (save-images paths db id-generator))
-                     collect (make-contents-appending :album album
+                     collect (make-pictures-appending :album album
                                                       :entities entities))))
-          (append-album-contents db appendings)))))
+          (append-album-pictures db appendings)))))
   (values))
