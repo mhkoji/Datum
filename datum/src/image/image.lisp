@@ -6,6 +6,7 @@
 
            :repository
            :make-repository
+           :create-images
            :save-images
            :load-images-by-ids
            :delete-images)
@@ -26,11 +27,9 @@
 
 (defstruct repository db)
 
-(defun save-images (paths repos id-generator)
-  (let ((images (create-images id-generator paths)))
-    (datum.image.db:insert-images (repository-db repos) images))
+(defun save-images (repos images)
+  (datum.image.db:insert-images (repository-db repos) images)
   (values))
-
 
 (defun load-images-by-ids (repos image-ids)
   (datum.image.db:select-images (repository-db repos) image-ids))

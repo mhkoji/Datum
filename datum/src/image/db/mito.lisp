@@ -1,5 +1,6 @@
 (defpackage :datum.image.db.mito
   (:use :cl :datum.image.db)
+  (:export :%image)
   (:import-from :dbi.driver
                 :<dbi-connection>))
 (in-package :datum.image.db.mito)

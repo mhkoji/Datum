@@ -34,7 +34,7 @@
 
 (defstruct pictures-appending album entities)
 
-(defun append-album-pictures (db pictures-appendings)
+(defun append-album-pictures (pictures-appendings db)
   (dolist (appending pictures-appendings)
     (let ((album (pictures-appending-album appending))
           (entities (pictures-appending-entities appending)))
@@ -57,8 +57,8 @@
    (loader-thumbnail-repository loader)))
 
 
-(defun delete-albums (db entity-repository album-ids)
-  (datum.album.pictures:delete-by-album-ids db entity-repository album-ids)
+(defun delete-albums (db album-ids)
+  (datum.album.pictures:delete-by-album-ids db album-ids)
   (datum.album.repository:delete-albums db album-ids))
 
 

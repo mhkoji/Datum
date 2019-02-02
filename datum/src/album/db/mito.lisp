@@ -1,5 +1,7 @@
 (defpackage :datum.album.db.mito
   (:use :cl :datum.album.db)
+  (:export :album
+           :album-thumbnail)
   (:import-from :dbi.driver
                 :<dbi-connection>))
 (in-package :datum.album.db.mito)
@@ -8,9 +10,7 @@
   ((album-id :col-type (:varchar 256)
              :accessor album-id)
    (name :col-type (:varchar 256)
-         :accessor album-name)
-   (updated-at :col-type (:bigint 20)
-               :accessor album-updated-at))
+         :accessor album-name))
   (:metaclass mito:dao-table-class))
 
 (defmethod insert-album-rows ((db <dbi-connection>)

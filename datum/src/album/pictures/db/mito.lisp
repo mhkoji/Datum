@@ -1,5 +1,6 @@
 (defpackage :datum.album.pictures.db.mito
   (:use :cl :datum.album.pictures.db)
+  (:export :album-picture)
   (:import-from :dbi.driver
                 :<dbi-connection>))
 (in-package :datum.album.pictures.db.mito)

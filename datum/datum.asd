@@ -28,12 +28,22 @@
     ((:file "retrieve")
      (:file "thumbnail")))
 
-   (:file "album/pictures/entities")
+   (:module :db
+    :pathname "db"
+    :components
+    ((:file "db")
+     (:file "mito")))
 
+   (:file "container")
+
+   (:file "album/thumbnail/entities")
+   (:file "album/pictures/entities")
    (:file "album/pictures/db/mito")
    (:file "album/db/mito")
+
    (:file "image/db/mito"))
 
   :depends-on (:babel
                :ironclad
-               :mito))
+               :mito
+               :log4cl))
