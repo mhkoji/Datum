@@ -26,9 +26,10 @@
   (let ((objects (mito:select-dao 'album
                    (sxql:where (:in :album-id album-ids)))))
     (mapcar (lambda (obj)
-              (make-album-row :id (album-id obj)
-                              :name (album-name obj)
-                              :updated-at (album-updated-at obj)))
+              (make-album-row
+               :id (album-id obj)
+               :name (album-name obj)
+               :updated-at (mito.dao.mixin:object-updated-at obj)))
             objects)))
 
 (defmethod select-album-ids ((db <dbi-connection>)

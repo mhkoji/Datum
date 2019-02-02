@@ -19,7 +19,7 @@
                      :path (image-path image))))
 
 (defmethod select-images ((db <dbi-connection>) (image-ids list))
-  (let ((objects (mito:select-dao 'image
+  (let ((objects (mito:select-dao '%image
                    (sxql:where (:in :image-id image-ids)))))
     (mapcar (lambda (obj)
               (make-image :id (%image-id obj) :path (%image-path obj)))
