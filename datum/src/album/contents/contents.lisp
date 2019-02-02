@@ -6,30 +6,31 @@
            :append-to-album))
 (in-package :datum.album.contents)
 
-(defgeneric content-id (content))
+;;; A content is an entity who plays the following roles.
+(defgeneric content-id (entity))
 
-(defgeneric load-by-ids (content-repository content-ids))
+(defgeneric load-by-ids (entity-repository content-ids))
 
-(defgeneric delete-by-ids (content-repository content-ids))
+(defgeneric delete-by-ids (entity-repository content-ids))
 
 
 ;;; In this context, an album is an object which has its unique id.
 (defgeneric album-id (album))
 
-(defun load-by-album (db content-repository album)
+(defun load-by-album (db entity-repository album)
   (let ((content-ids (datum.album.contents.db:select-contents
                       db (list (album-id album)))))
-    (load-by-ids content-repository content-ids)))
+    (load-by-ids entity-repository content-ids)))
 
 
-(defun delete-by-album-ids (db content-repository album-ids)
+(defun delete-by-album-ids (db entity-repository album-ids)
   (let ((content-ids (datum.album.contents.db:select-contents
                       db album-ids)))
-    (delete-by-ids content-repository content-ids))
+    (delete-by-ids entity-repository content-ids))
   (datum.album.contents.db:delete-contents db album-ids))
 
 
-(defun append-to-album (db album contents)
+(defun append-to-album (db album entities)
   (let ((album-id (album-id album))
-        (content-ids (mapcar #'content-id contents)))
+        (content-ids (mapcar #'content-id entities)))
     (datum.album.contents.db:insert-contents db album-id content-ids)))

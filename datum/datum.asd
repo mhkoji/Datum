@@ -28,6 +28,8 @@
     ((:file "retrieve")
      (:file "thumbnail")))
 
+   (:file "album/contents/entities")
+
    (:file "album/contents/db/mito")
    (:file "album/db/mito")
    (:file "image/db/mito"))

@@ -4,7 +4,7 @@
            :load-by-ids))
 (in-package :datum.album.thumbnail)
 
-(defgeneric thumbnail-id (th))
+;;; A thumbnail is an entity who plays the following roles.
+(defgeneric thumbnail-id (thumbnail))
 
-(defgeneric load-by-ids (thumbnail-repository ids))
-
+(defgeneric load-by-ids (thumbnail-repository thumbnail-ids))

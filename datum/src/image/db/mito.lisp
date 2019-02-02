@@ -4,7 +4,7 @@
                 :<dbi-connection>))
 (in-package :datum.image.db.mito)
 
-(defclass image ()
+(defclass %image ()
   ((image-id :col-type (:varchar 256)
              :accessor %image-id)
    (path :col-type (:varchar 256)
@@ -13,7 +13,7 @@
 
 (defmethod insert-images ((db <dbi-connection>) (images list))
   (dolist (image images)
-    (mito:create-dao 'image
+    (mito:create-dao '%image
                      :image-id (image-id image)
                      :path (image-path image))))
 
@@ -26,4 +26,4 @@
 
 (defmethod delete-images ((db <dbi-connection>) (image-ids list))
   (dolist (image-id image-ids)
-    (mito:delete-by-values 'image :image-id image-id)))
+    (mito:delete-by-values '%image :image-id image-id)))

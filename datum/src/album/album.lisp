@@ -8,15 +8,15 @@
            :make-contents-appending
            :append-album-contents
 
-           :make-source
-           :create-albums
-           :save-albums
-
            :make-loader
            :laod-albums-by-ids
            :load-albums-by-range
 
-           :delete-albums)
+           :delete-albums
+
+           :make-source
+           :create-albums
+           :save-albums)
   (:import-from :datum.album.repository
                 :album
                 :album-id
@@ -28,17 +28,17 @@
 (defmethod datum.album.contents:album-id ((album album))
   (album-id album))
 
-(defun album-contents (album db content-repository)
-  (datum.album.contents:load-by-album db content-repository album))
+(defun album-contents (album db entity-repository)
+  (datum.album.contents:load-by-album db entity-repository album))
 
 
-(defstruct contents-appending album contents)
+(defstruct contents-appending album entities)
 
 (defun append-album-contents (db contents-appendings)
   (dolist (appending contents-appendings)
     (let ((album (contents-appending-album appending))
-          (contents (contents-appending-contents appending)))
-      (datum.album.contents:append-to-album db album contents))))
+          (entities (contents-appending-entities appending)))
+      (datum.album.contents:append-to-album db album entities))))
 
 
 ;;; Album CRUD
@@ -57,8 +57,8 @@
    (loader-thumbnail-repository loader)))
 
 
-(defun delete-albums (db content-repository album-ids)
-  (datum.album.contents:delete-by-album-ids db content-repository album-ids)
+(defun delete-albums (db entity-repository album-ids)
+  (datum.album.contents:delete-by-album-ids db entity-repository album-ids)
   (datum.album.repository:delete-albums db album-ids))
 
 
