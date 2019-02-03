@@ -10,7 +10,7 @@
             [datum.gui.browser.url :as url]
             [datum.gui.browser.util :as util]))
 
-(defn create-store [update-store offset count]
+(defn create-store [update-store]
   {:show-covers
    {:state
     (datum.album.show-covers/State. [] true)
@@ -49,11 +49,9 @@
                         :enabled true}}
 
                 :show-covers
-                {:state
-                 (-> store :show-covers :state)
-                 :execute
-                 #((-> store :show-covers :execute) offset count)}
-
+                (let [{:keys [state execute]} (-> store :show-covers)]
+                  {:state state
+                   :execute #(execute offset count)})
                 }]
               elem)))
 
