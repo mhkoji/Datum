@@ -21,4 +21,4 @@
     ;; Pictures
     (when (not (state :pictures))
       (pictures api (state :album-id) (fn [pictures]
-       (update-state transaction #(assoc % :pictures images)))))))
+       (update-state transaction #(assoc % :pictures pictures)))))))
