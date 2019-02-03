@@ -33,7 +33,7 @@
                                      (destructuring-bind (type key) arg
                                        (ecase type
                                          (:query `(query params ,key))
-                                         (:param `(param params ,key)))))
+                                         (:param `(param params ',key)))))
                                    args)))
              (error (c)
                (declare (ignore c))

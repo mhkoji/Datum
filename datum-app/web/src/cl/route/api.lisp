@@ -18,16 +18,17 @@
       (with-container (container conf)
         (let ((albums (datum.album:load-albums-by-range
                        (get-album-loader container)
-                       offset count)))
+                       (or offset 0)
+                       (or count 500))))
           (mapcar #'datum.album:album-cover albums))))))
 
 (defun bind-image (app conf)
   (bind-route! app "/api/image/:id"
-    ((:param "id"))
+    ((:param :id))
     (lambda (id)
       (with-container (container conf)
         (let ((image (car (datum.image:load-images-by-ids
                            (get-image-repository container)
                            (list id)))))
           (datum.image:image-path image))))
-    :out #'as-json))
+    :out #'as-file))
