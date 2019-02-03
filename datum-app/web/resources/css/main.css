@@ -1,0 +1,43 @@
+body {
+  font-family: "メイリオ", sans-serif;
+}
+
+.datum-component-singleimageviewer-right
+.datum-component-doubleimageviewer-right {
+  display: inline;
+}
+
+.datum-component-singleimageviewer-image {
+  box-sizing: border-box;
+  overflow: hidden;
+  position: absolute;
+}
+
+.datum-component-singleviewer-image img {
+  width: 100%;
+}
+
+.datum-component-standardviewer-thumbnails {
+  width: 160px;
+  height: 100%;
+  border-left: 2px solid #cbcbcb;
+  float:right;
+  overflow-y: auto;
+  position: relative;
+  box-sizing: border-box;
+  z-index: 2;
+  position: relative;
+}
+
+.datum-component-standardviewer-thumbnail {
+  padding: 4px 4px 4px 4px;
+}
+
+.datum-component-standardviewer-thumbnail img {
+  width: 150px;
+  height: auto;
+}
+
+.datum-component-standardviewer-thumbnail-highlighted {
+  background-color: #428bca;
+}
