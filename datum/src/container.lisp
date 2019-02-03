@@ -7,9 +7,8 @@
            :get-db
            :get-id-generator
            :get-image-repository
-           :get-album-thumbnail-repository
-           :get-thumbnail-file-fn
-           :get-album-picture-entity-repository))
+           :get-album-loader
+           :get-thumbnail-file-fn))
 (in-package :datum.container)
 
 (defstruct configure
@@ -35,12 +34,10 @@
 (defun get-image-repository (c)
   (datum.image:make-repository :db (get-db c)))
 
-(defun get-album-picture-entity-repository (c)
-  (get-image-repository c))
-
-(defun get-album-thumbnail-repository (c)
-  (get-image-repository c))
-
+(defun get-album-loader (c)
+  (datum.album:make-loader
+   :db (get-db c)
+   :thumbnail-repository (get-image-repository c)))
 
 (defun get-thumbnail-file-fn (c)
   (labels ((make-thumbnail-path (source-path)

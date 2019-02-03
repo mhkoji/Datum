@@ -5,6 +5,13 @@
            :album-thumbnail
            :album-pictures
 
+           :album-cover
+
+           :cover
+           :cover-album-id
+           :cover-name
+           :cover-thumbnail
+
            :make-pictures-appending
            :append-album-pictures
 
@@ -23,6 +30,7 @@
                 :album-name
                 :album-thumbnail))
 (in-package :datum.album)
+
 
 ;;; Pictures
 (defmethod datum.album.pictures:album-id ((album album))
@@ -80,3 +88,12 @@
 
 (defun save-albums (db albums)
   (datum.album.repository:save-albums db albums))
+
+
+
+(defstruct cover album-id name thumbnail)
+
+(defun album-cover (album)
+  (make-cover :album-id (album-id album)
+              :name (album-name album)
+              :thumbnail (album-thumbnail album)))

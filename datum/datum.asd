@@ -28,20 +28,20 @@
     ((:file "retrieve")
      (:file "thumbnail")))
 
+   (:file "album/thumbnail/entities")
+   (:file "album/pictures/entities")
+   (:file "album/pictures/db/mito")
+   (:file "album/db/mito")
+
+   (:file "image/db/mito")
+
    (:module :db
     :pathname "db"
     :components
     ((:file "db")
      (:file "mito")))
 
-   (:file "container")
-
-   (:file "album/thumbnail/entities")
-   (:file "album/pictures/entities")
-   (:file "album/pictures/db/mito")
-   (:file "album/db/mito")
-
-   (:file "image/db/mito"))
+   (:file "container"))
 
   :depends-on (:babel
                :ironclad
