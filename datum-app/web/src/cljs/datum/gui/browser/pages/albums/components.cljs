@@ -1,28 +1,10 @@
 (ns datum.gui.browser.pages.albums.components
   (:require [reagent.core :as r]
-            [datum.gui.browser.url :as url]
+            [datum.gui.components.tag :as tag]
+            [datum.gui.components.cards :as cards]
             [datum.gui.browser.components.header.reagent
-             :refer [header-component]]))
-
-(defn rows [num% items item-key item-render]
-  (let [count (count items)]
-    (let [num (min num% count)
-          group (group-by first
-                 (map-indexed (fn [index item]
-                                (list (quot index num) item))
-                              items))]
-      [:div {:class "container"}
-       (for [row-index (sort < (keys group))]
-         ^{:key (str row-index)}
-         [:div {:class "card-deck"}
-          (for [[_ item] (group row-index)]
-            ^{:key (item-key item)}
-            [item-render item])])])))
-
-
-(defn tag-button [{:keys [on-click]}]
-  [:button {:type "button" :class "btn" :on-click on-click}
-   "Tags"])
+             :refer [header-component]]
+            [datum.gui.browser.url :as url]))
 
 (defn cover-component [{:keys [cover on-click-tag-button]}]
   (let [link (url/album (-> cover :album-id))]
@@ -34,7 +16,7 @@
      [:div {:class "card-body"}
       [:div {:class "card-title"} (-> cover :name)]
       (when on-click-tag-button
-        [:p [tag-button {:on-click on-click-tag-button}]])]]))
+        [:p [tag/button {:on-click on-click-tag-button}]])]]))
 
 
 (defn link [{:keys [link enabled]} & children]
@@ -76,7 +58,7 @@
 
          [pager-component pager]
 
-         [rows 4 (-> show-covers :state :covers) :album-id
+         [cards/card-decks 4 (-> show-covers :state :covers) :album-id
           #(cover-component
             {:cover %
              :on-click-tag-button (-> edit-content-tags :execute)})]

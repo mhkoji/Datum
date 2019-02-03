@@ -1,12 +1,13 @@
 (ns datum.gui.browser.main
   (:require [bidi.bidi :refer [match-route]]
             [goog.dom :as gdom]
+            [datum.gui.browser.pages.album]
             [datum.gui.browser.pages.albums]))
 
 (def *routes*
   ["/"
    {["album/" :album-id]
-    nil
+    datum.gui.browser.pages.album/render-loop
 
     "albums"
     datum.gui.browser.pages.albums/render-loop

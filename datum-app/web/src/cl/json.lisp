@@ -22,6 +22,15 @@
     ("thumbnail"
      (as-jsown (datum.album:cover-thumbnail obj)))))
 
+(defmethod as-jsown ((obj datum.album:overview))
+  (jsown:new-js
+    ("album-id"
+     (datum.album:overview-album-id obj))
+    ("name"
+     (datum.album:overview-name obj))
+    ("pictures"
+     (as-jsown (datum.album:overview-pictures obj)))))
+
 
 (defun make-result (obj success)
   (jsown:to-json

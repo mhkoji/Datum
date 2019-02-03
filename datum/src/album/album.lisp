@@ -6,17 +6,22 @@
            :album-pictures
 
            :album-cover
-
            :cover
            :cover-album-id
            :cover-name
            :cover-thumbnail
 
+           :album-overview
+           :overview
+           :overview-album-id
+           :overview-name
+           :overview-pictures
+
            :make-pictures-appending
            :append-album-pictures
 
            :make-loader
-           :laod-albums-by-ids
+           :load-albums-by-ids
            :load-albums-by-range
 
            :delete-albums
@@ -97,3 +102,11 @@
   (make-cover :album-id (album-id album)
               :name (album-name album)
               :thumbnail (album-thumbnail album)))
+
+
+(defstruct overview album-id name pictures)
+
+(defun album-overview (album db entity-repository)
+  (make-overview :album-id (album-id album)
+                 :name (album-name album)
+                 :pictures (album-pictures album db entity-repository)))

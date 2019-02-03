@@ -20,7 +20,17 @@
                        (get-album-loader container)
                        (or offset 0)
                        (or count 500))))
-          (mapcar #'datum.album:album-cover albums))))))
+          (mapcar #'datum.album:album-cover albums)))))
+  (bind-route! app "/api/album/:id/overview"
+    ((:param :id))
+    (lambda (album-id)
+      (with-container (container conf)
+        (let ((album (car (datum.album:load-albums-by-ids
+                           (get-album-loader container)
+                           (list album-id)))))
+          (datum.album:album-overview album
+           (get-db container)
+           (get-image-repository container)))))))
 
 (defun bind-image (app conf)
   (bind-route! app "/api/image/:id"
