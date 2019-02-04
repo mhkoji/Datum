@@ -15,10 +15,10 @@
      (:link
       :rel "stylesheet"
       :type "text/css"
-      :href "/resources/third_party/bootstrap-4.0.0/dist/css/bootstrap.min.css")
+      :href "/resources/third-party/bootstrap/dist/css/bootstrap.min.css")
      (:link
       :rel "stylesheet"
-      :href "/resources/third_party/open-iconic-1.1.0/font/css/open-iconic-bootstrap.css")
+      :href "/resources/third-party/open-iconic/font/css/open-iconic-bootstrap.css")
 
      (:body
      (:div :id "app")
@@ -31,4 +31,4 @@
       :crossorigin "anonymous")
      (:script
       :type "text/javascript"
-      :src "/resources/third_party/bootstrap-4.0.0/dist/js/bootstrap.bundle.min.js")))))
+      :src "/resources/third-party/bootstrap/dist/js/bootstrap.bundle.min.js")))))
