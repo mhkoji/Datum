@@ -1,0 +1,3 @@
+[submodule "datum-app/web/resources/third-party/bootstrap"]
+	path = datum-app/web/resources/third-party/bootstrap
+	url = https://github.com/twbs/bootstrap
