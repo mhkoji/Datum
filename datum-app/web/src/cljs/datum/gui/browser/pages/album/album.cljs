@@ -1,8 +1,8 @@
 (ns datum.gui.browser.pages.album
   (:require [clojure.browser.repl :as repl]
             [reagent.core :as r]
-            [datum.album.api]
             [datum.album.show-overview]
+            [datum.album.api]
             [datum.gui.browser.components.header.state :as header]
             [datum.gui.browser.pages.album.components]
             [datum.gui.browser.url :as url]
