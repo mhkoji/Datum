@@ -10,8 +10,11 @@
   ((album-id :col-type (:varchar 256)
              :accessor album-id)
    (name :col-type (:varchar 256)
-         :accessor album-name))
-  (:metaclass mito:dao-table-class))
+         :accessor album-name)
+   (updated-at :col-type :timestamp
+               :accessor album-updated-at))
+  (:metaclass mito:dao-table-class)
+  (:record-timestamps nil))
 
 (defmethod insert-album-rows ((db <dbi-connection>)
                               (rows list))
@@ -29,13 +32,16 @@
               (make-album-row
                :id (album-id obj)
                :name (album-name obj)
-               :updated-at (mito.dao.mixin:object-updated-at obj)))
+               :updated-at (album-updated-at obj)))
             objects)))
 
 (defmethod select-album-ids ((db <dbi-connection>)
                              offset count)
   (mapcar #'album-id
-          (mito:select-dao 'album (sxql:limit offset count))))
+          (mito:select-dao 'album
+            (sxql:order-by (:desc :updated_at))
+            (sxql:limit offset count))))
+
 
 (defmethod delete-album-rows ((db <dbi-connection>) (album-ids list))
   (dolist (album-id album-ids)

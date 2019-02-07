@@ -30,7 +30,8 @@
                     (lambda (dir)
                       (make-source
                        :name (dir-path dir)
-                       :updated-at (dir-write-date dir)
+                       :updated-at (local-time:universal-to-timestamp
+                                    (dir-write-date dir))
                        :thumbnail
                        (when-let ((paths (dir-file-paths dir)))
                          (create-thumbnail (car paths)
