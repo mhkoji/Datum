@@ -20,6 +20,13 @@
     ((:file "db/db")
      (:file "image")))
 
+   (:module :tag
+    :pathname "tag"
+    :components
+    ((:file "db/db")
+     (:file "tag")
+     (:file "contents")))
+
    (:file "stream")
 
    (:module :fs

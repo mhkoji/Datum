@@ -1,6 +1,7 @@
 (defpackage :datum.album
   (:use :cl)
-  (:export :album-id
+  (:export :album
+           :album-id
            :album-name
            :album-thumbnail
            :album-pictures
@@ -21,6 +22,7 @@
            :append-album-pictures
 
            :make-loader
+           :loader
            :load-albums-by-ids
            :load-albums-by-range
 
