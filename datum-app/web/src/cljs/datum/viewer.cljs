@@ -6,6 +6,13 @@
 (defrecord State [images index size])
 
 
+(defn make-state [images initial-image-id]
+  (let [index (or (when initial-image-id
+                    (.indexOf (map :image-id images) initial-image-id))
+                  0)]
+    (State. images index nil)))
+
+
 (defn increment-index [transaction diff]
   (update-state transaction (fn [state]
     (let [images (-> state :images)

@@ -7,14 +7,14 @@
             [datum.gui.browser.util :as util]
             [datum.gui.browser.pages.album.view.single.components :as c]))
 
-(defn create-store [update-store images]
+(defn create-store [update-store images initial-image-id]
   {:viewer
    (let [transaction
          (reify datum.viewer/Transaction
            (datum.viewer/update-state [_ f]
              (update-store #(update-in % [:viewer :state] f))))]
      {:state
-      (datum.viewer/State. images 0 nil)
+      (datum.viewer/make-state images initial-image-id)
 
       :increment-index
       #(datum.viewer/increment-index transaction %)

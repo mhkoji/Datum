@@ -1,6 +1,7 @@
 (ns datum.gui.browser.pages.album.view
   (:require [goog.events :as gevents]
             [goog.History]
+            [goog.Uri]
             [reagent.core :as r]
             [datum.album.api]
             [datum.gui.browser.pages.album.view.single :as single]
@@ -8,11 +9,16 @@
             [datum.gui.browser.url :as url]
             [datum.gui.browser.util :as util]))
 
+(defn get-initial-image-id []
+  (let [uri (goog.Uri. js/location.search)]
+    (-> uri (.getQueryData) (.get "current"))))
+
 (defn viewer-store [update-store images]
   {:type :viewer
    :store (single/create-store
            (fn [f] (update-store #(update % :store f)))
-           images)})
+           images
+           (get-initial-image-id))})
 
 (defn loading-store [update-store album-id]
   {:type :loading
@@ -20,8 +26,7 @@
            (fn [f] (update-store #(update % :store f)))
            album-id
            (fn [images]
-             (update-store #(viewer-store update-store images))))
-   })
+             (update-store #(viewer-store update-store images))))})
 
 
 (defn get-uri []
