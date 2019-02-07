@@ -1,25 +1,27 @@
-(ns datum.gui.browser.pages.album.view.single
-  (:require [reagent.core :as r]
+(ns datum.gui.browser.pages.album.view
+  (:require [goog.events :as gevents]
+            [goog.History]
+            [reagent.core :as r]
             [datum.album.api]
-            [datum.gui.browser.components.header.state :as header]
-            [datum.album.show-viewer]
-            [datum.gui.browser.pages.album.viewer.components]
+            [datum.gui.browser.pages.album.view.single :as single]
+            [datum.gui.browser.pages.album.view.loading :as loading]
             [datum.gui.browser.url :as url]
             [datum.gui.browser.util :as util]))
 
-(defn viewer-store [update-store album-id]
+(defn viewer-store [update-store images]
   {:type :viewer
-   :store (datum.gui.browser.pages.album.view.single/create-store
+   :store (single/create-store
            (fn [f] (update-store #(update % :store f)))
            images)})
 
-(defn loading-store [update-store images]
+(defn loading-store [update-store album-id]
   {:type :loading
-   :store (datum.gui.browser.pages.album.view.loading/create-store
+   :store (loading/create-store
            (fn [f] (update-store #(update % :store f)))
            album-id
            (fn [images]
-             (update-store #(viewer-store update-store pimages))))})
+             (update-store #(viewer-store update-store images))))
+   })
 
 
 (defn get-uri []
@@ -28,17 +30,16 @@
      (if (= hash "") "" (subs hash 1)))))
 
 (defn render-loop-internal [elem album-id]
-  (let [renderers
-        {:viewer
-         (datum.gui.browser.pages.album.view.single/create-renderer elem album-id)
-         :loading
-         (datum.gui.browser.pages.album.view.loadgin/create-renderer elem)}]
+  (let [renderers {:viewer (single/create-renderer elem album-id)
+                   :loading (loading/create-renderer elem)}]
     (util/render-loop {:create-store
                        (fn [update-store]
                          (loading-store update-store album-id))
                        :render
                        (fn [store]
-                         ((renderers (:type store))))})))
+                         (let [render (renderers (:type store))]
+                           (render (:store store))))
+                       })))
 
 
 (defn render-loop [elem {:keys [album-id]}]

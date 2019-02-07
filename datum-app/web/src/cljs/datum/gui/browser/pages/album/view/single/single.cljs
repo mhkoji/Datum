@@ -20,7 +20,7 @@
       #(datum.viewer/increment-index transaction %)
 
       :set-size
-      #(datum.viewer/set-size transient %)})})
+      #(datum.viewer/set-size transaction %)})})
 
 (defn create-renderer [elem album-id]
   (fn [store]

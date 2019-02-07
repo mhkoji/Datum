@@ -1,5 +1,6 @@
 (ns datum.gui.browser.pages.album.view.loading
   (:require [reagent.core :as r]
+            [datum.album.api]
             [datum.gui.browser.components.header.state :as header]
             [datum.gui.browser.components.header.reagent
              :refer [header-component]]))
@@ -14,7 +15,7 @@
 
 
 (defn load-images [transaction api]
-  (images api album-id (fn [images]
+  (images api (fn [images]
     (update-state transaction #(assoc % :images images)))))
 
 
@@ -24,8 +25,8 @@
 (defn page [{:keys [on-show]}]
   (r/create-class
    {:component-did-mount
-    (fn [this]
-      (on-show))
+    (fn [comp]
+      ((-> (r/props comp) :on-show)))
     :reagent-render
     (fn []
       [:div
@@ -37,27 +38,26 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn create-store [update-store]
+(defn create-store [update-store album-id on-loaded]
   {:loading
    {:state (State. nil)
     :load-images
-    (fn [album-id]
+    (fn []
       (load-images
+
        (reify Transaction
-         (update-state []
+         (update-state [_ f]
            (update-store #(update-in % [:loading :state] f))))
 
        (reify Api
          (images [_ k]
-           (datum.album.api/overview album-id #(k (-> % :pictures)))))))
+           (datum.album.api/overview album-id (fn [overview]
+             (let [images (-> overview :pictures)]
+               (on-loaded images)
+               (k images))))))))
     }})
 
-(defn store-state [store]
-  (-> store :state))
-
-(defn create-renderer [elem album-id]
+(defn create-renderer [elem]
   (fn [store]
-    (r/render [page
-               {:on-show
-                #((-> store :loading :load-images) album-id)}]
+    (r/render [page {:on-show (-> store :loading :load-images)}]
               elem)))

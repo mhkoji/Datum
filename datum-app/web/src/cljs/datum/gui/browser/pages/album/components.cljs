@@ -17,24 +17,22 @@
       [:div
        [header-component header]
 
-       (let [overview (-> show-overview :state :overview)]
+       (let [overview (-> show-overview :state :overview)
+             album-id (-> overview :album-id)]
          [:main {:class "pt-3 px-4"}
           [:h1 {:class "h2"}
-           (or (-> overview :name)
-               (-> overview :album-id)
-               "Album")]
+           (or (-> overview :name) album-id "Album")]
 
           (if-let [pictures (-> overview :pictures)]
             [:container
              [:div
               [:p [tag/button {:on-click nil}]]]
 
-
              (cards/card-decks 4 pictures :image-id
-              (fn [pic]
+              (fn [image]
                 [:div {:class "col-md-4"}
                  [:div {:class "card mb-4 box-shadow"}
-                  [:a "" ;; TODO
+                  [:a {:href (url/album-viewer-single album-id image)}
                    [:img {:class "card-img-top"
-                          :src (url/image pic)}]]]]))]
+                          :src (url/image image)}]]]]))]
             [:div "Loading..."])])])}))

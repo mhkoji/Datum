@@ -57,23 +57,6 @@
           [:div {:ref #(reset! thumbnail-elem %)
                  :class "datum-component-standardviewer-thumbnails"}
 
-           [:div {:class "dropdown"}
-            [:a {:class "btn btn-secondary dropdown-toggle"
-                 :href "#"
-                 :role "button"
-                 :id "dropdownMenuLink"
-                 :data-toggle "dropdown"
-                 :aria-haspopup "true"
-                 :aria-expanded "false"}
-             "Single"]
-
-            [:div {:class "dropdown-menu"
-                   :aria-labelledby "dropdownMenuLink"}
-             (for [{:keys [id name link]} []]
-               ^{:key id}
-               [:a {:class "dropdown-item" :href link}
-                name])]]
-
            (let [base-name "datum-component-standardviewer-thumbnail"]
              (for [{:keys [image link highlighted-p]} neighboring-thumbnails]
                ^{:key (-> image :image-id)}
