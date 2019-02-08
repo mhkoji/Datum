@@ -3,7 +3,13 @@
   (:export :tag
            :tag-id
            :tag-name
+           :tag-contents
 
+           :attach-tag
+           :detach-tag
+
+           :load-tags-by-ids
+           :load-tags-by-range
            :save-tag
            :delete-tag
 
@@ -34,6 +40,19 @@
     (datum.tag.db:delete-tag-content-rows db tag-ids)
     (datum.tag.db:delete-tag-rows db tag-ids))
   (values))
+
+
+(defun row->tag (row)
+  (make-tag :id (datum.tag.db:tag-row-tag-id row)
+            :name (datum.tag.db:tag-row-name row)))
+
+(defun load-tags-by-range (db offset count)
+  (mapcar #'row->tag
+          (datum.tag.db:select-tag-rows db offset count)))
+
+(defun load-tags-by-ids (db tag-ids)
+  (mapcar #'row->tag
+          (datum.tag.db:select-tag-rows-in db tag-ids)))
 
 
 (defun attach-tag (db tag content)

@@ -1,16 +1,20 @@
 (defpackage :datum.tag.db
   (:use :cl)
-  (:export :select-tag-rows-by-content
+  (:export :select-tag-rows
+           :select-tag-rows-in
            :insert-tag-row
            :delete-tag-rows
+           :make-tag-row
            :tag-row-tag-id
            :tag-row-name
 
+           :select-tag-rows-by-content
            :select-tag-content-rows
            :insert-tag-content-rows
            :delete-tag-content-rows
            :delete-tag-content-rows-only
            :make-tag-content-row
+           :tag-content-row-tag-id
            :tag-content-row-content-id
            :tag-content-row-content-type))
 (in-package :datum.tag.db)
@@ -19,9 +23,11 @@
   tag-id
   name)
 
+(defgeneric select-tag-rows (db offset count))
+(defgeneric select-tag-rows-in (db tag-ids))
 (defgeneric insert-tag-row (db name))
 (defgeneric delete-tag-rows (db tag-ids))
-(defgeneric select-tag-rows-by-content (db content-id))
+
 
 
 (defstruct tag-content-row
@@ -29,6 +35,7 @@
   content-id
   content-type)
 
+(defgeneric select-tag-rows-by-content (db content-id))
 (defgeneric select-tag-content-rows (db tag-id))
 (defgeneric insert-tag-content-rows (db rows))
 (defgeneric delete-tag-content-rows (db tag-ids))

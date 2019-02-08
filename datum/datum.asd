@@ -42,6 +42,8 @@
 
    (:file "image/db/mito")
 
+   (:file "tag/db/mito")
+
    (:module :db
     :pathname "db"
     :components
