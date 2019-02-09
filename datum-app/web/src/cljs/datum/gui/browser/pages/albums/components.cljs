@@ -15,6 +15,11 @@
 
      [:div {:class "card-body"}
       [:div {:class "card-title"} (-> cover :name)]
+      [:a {:href link
+           :class "btn btn-secondary btn-sm"
+           :type "button"}
+       "Open"]
+      [:div ]
       (when on-click-tag-button
         [:p [tag/button {:on-click on-click-tag-button}]])]]))
 

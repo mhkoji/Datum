@@ -54,6 +54,7 @@
         (values))
       :method :put)))
 
+
 (defun bind-image (app conf)
   (bind-route! app "/api/image/:id"
     ((:param :id))

@@ -1,6 +1,5 @@
 (ns datum.gui.browser.pages.albums
-  (:require [clojure.browser.repl :as repl]
-            [cljs.reader :refer [read-string]]
+  (:require [cljs.reader :refer [read-string]]
             [reagent.core :as r]
             [goog.Uri :as guri]
             [datum.album.show-covers]
