@@ -4,6 +4,8 @@
             [goog.Uri :as guri]
             [datum.album.show-covers]
             [datum.album.api]
+            [datum.gui.browser.controllers.edit-album-tags
+             :as edit-album-tags]
             [datum.gui.browser.components.header.state :as header]
             [datum.gui.browser.pages.albums.components]
             [datum.gui.browser.url :as url]
@@ -29,7 +31,11 @@
        offset
 
        count))
-    }})
+    }
+
+   :edit-album-tags
+   (edit-album-tags/closed-store update-store)
+   })
 
 
 (defn create-renderer [elem offset count]
@@ -51,6 +57,9 @@
                 (let [{:keys [state execute]} (-> store :show-covers)]
                   {:state state
                    :execute #(execute offset count)})
+
+                :edit-album-tags
+                (-> store :edit-album-tags)
                 }]
               elem)))
 

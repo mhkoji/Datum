@@ -42,7 +42,7 @@
     [link next ^{:key "next"} [icon-next]]]])
 
 
-(defn page [{:keys [header pager show-covers edit-content-tags]}]
+(defn page [{:keys [header pager show-covers edit-album-tags]}]
   (r/create-class
    {:component-did-mount
     (fn [comp]
@@ -64,8 +64,10 @@
          [pager-component pager]
 
          [cards/card-decks 4 (-> show-covers :state :covers) :album-id
-          #(cover-component
-            {:cover %
-             :on-click-tag-button (-> edit-content-tags :execute)})]
+          (fn [cover]
+            [cover-component
+             {:cover cover
+              :on-click-tag-button #((-> edit-album-tags :store :start)
+                                     (-> cover :album-id))}])]
 
          [pager-component pager]]]])}))

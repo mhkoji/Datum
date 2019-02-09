@@ -29,21 +29,7 @@
            (datum.album.api/overview id k)))
 
        album-id))}
-   :edit-album-tags
-   {:state
-
-    :load-tags
-
-    :attach-tag
-
-    :detach-tag}
-
-   :add-new-tag
-   {:state
-
-    :change-name
-
-    :submit}})
+   })
 
 (defn create-renderer [elem album-id]
   (fn [store]
