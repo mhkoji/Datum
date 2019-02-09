@@ -11,8 +11,8 @@
            :select-tag-rows-by-content
            :select-tag-content-rows
            :insert-tag-content-rows
-           :delete-tag-content-rows
-           :delete-tag-content-rows-only
+           :delete-tag-content-rows-by-tags
+           :delete-tag-content-rows-by-contents
            :make-tag-content-row
            :tag-content-row-tag-id
            :tag-content-row-content-id
@@ -38,5 +38,5 @@
 (defgeneric select-tag-rows-by-content (db content-id))
 (defgeneric select-tag-content-rows (db tag-id))
 (defgeneric insert-tag-content-rows (db rows))
-(defgeneric delete-tag-content-rows (db tag-ids))
-(defgeneric delete-tag-content-rows-only (db tag-id content-ids))
+(defgeneric delete-tag-content-rows-by-tags (db tag-ids))
+(defgeneric delete-tag-content-rows-by-contents (db content-ids))

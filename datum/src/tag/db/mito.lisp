@@ -67,14 +67,12 @@
                      :content-id (tag-content-row-content-id row)
                      :content-type (tag-content-row-content-type row))))
 
-(defmethod delete-tag-content-rows ((db <dbi-connection>) (tag-ids list))
+(defmethod delete-tag-content-rows-by-tags ((db <dbi-connection>)
+                                            (tag-ids list))
   (dolist (tag-id tag-ids)
     (mito:delete-by-values 'tag-content :tag-id tag-id)))
 
-(defmethod delete-tag-content-rows-only ((db <dbi-connection>)
-                                         tag-id
-                                         (content-ids list))
+(defmethod delete-tag-content-rows-by-contents ((db <dbi-connection>)
+                                                (content-ids list))
   (dolist (content-id content-ids)
-    (mito:delete-by-values 'tag-content
-                           :tag-id tag-id
-                           :content-id content-id)))
+    (mito:delete-by-values 'tag-content :content-id content-id)))
