@@ -14,6 +14,7 @@
   (let ((app (make-instance 'ningle:<app>)))
     (datum.app.web.route.api:bind-album app conf)
     (datum.app.web.route.api:bind-image app conf)
+    (datum.app.web.route.api:bind-tag app conf)
     (datum.app.web.route.asset:bind-resources
      app (namestring *default-pathname-defaults*))
     (datum.app.web.route.asset:bind-html app)

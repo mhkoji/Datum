@@ -5,6 +5,13 @@
 
 (defgeneric as-jsown (obj))
 
+(defun make-result (obj success)
+  (jsown:to-json
+   (jsown:new-js
+     ("success" (if success :t :f))
+     ("result"  (as-jsown obj)))))
+
+
 (defmethod as-jsown ((obj list))
   (mapcar #'as-jsown obj))
 
@@ -31,9 +38,9 @@
     ("pictures"
      (as-jsown (datum.album:overview-pictures obj)))))
 
-
-(defun make-result (obj success)
-  (jsown:to-json
-   (jsown:new-js
-     ("success" (if success :t :f))
-     ("result"  (as-jsown obj)))))
+(defmethod as-jsown ((obj datum.tag:tag))
+  (jsown:new-js
+    ("tag-id"
+     (datum.tag:tag-id obj))
+    ("name"
+     (datum.tag:tag-name obj))))
