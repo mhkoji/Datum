@@ -47,7 +47,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn editing-modal [{:keys [on-save on-cancel tag-states]}]
+(defn editing-modal [{:keys [new-tag existing-tags
+                             on-save
+                             on-cancel]}]
   (r/create-element
    js/ReactModal
    #js {:isOpen true
@@ -56,21 +58,21 @@
    (r/as-element
     [:div
      [:div
-      [:div {:class "input-group"}
-       [:input {:type "text"
-                :class "form-control"
-                :value ""
-                :on-change #(js/console.log
-                             (.-value (.-target %)))}]
-       [:div {:class "input-group-append"}
-        [:button {:type "button"
-                  :class"btn btn-primary"
-                  :on-click nil}
-         [:span {:class "oi oi-plus"}]]]]
+      (let [{:keys [name on-create on-change]} new-tag]
+        [:div {:class "input-group"}
+         [:input {:type "text"
+                  :class "form-control"
+                  :value name
+                  :on-change #(on-change (.-value (.-target %)))}]
+         [:div {:class "input-group-append"}
+          [:button {:type "button"
+                    :class"btn btn-primary"
+                    :on-click on-create}
+           [:span {:class "oi oi-plus"}]]]])
 
       [:ul {:class "list-group"}
        (for [{:keys [tag attached-p
-                     on-toggle on-delete]} tag-states]
+                     on-toggle on-delete]} existing-tags]
          ^{:key (:tag-id tag)}
          [:li {:class "list-group-item"}
           [:label
@@ -80,7 +82,7 @@
            (:name tag)]
           [:div {:class "float-right"}
            [:button {:type "button" :class "btn btn-danger btn-sm"
-                     :on-click on-delete}
+                     :on-click #(on-delete tag)}
             [:span {:class "oi oi-delete"}]]]])]]
 
     [modal-footer {:on-save on-save :on-cancel on-cancel}]])))

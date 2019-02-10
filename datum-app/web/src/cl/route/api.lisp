@@ -73,7 +73,20 @@
     (lambda ()
       (with-container (container conf)
         (datum.tag:load-tags-by-range (get-db container) 0 50))))
-  (bind-route! app "/api/:id/albums"
+  (bind-route! app "/api/tags"
+    ((:query "name"))
+    (lambda (name)
+      (with-container (container conf)
+        (datum.tag:save-tag (get-db container) name)))
+    :method :put)
+
+  (bind-route! app "/api/tag/:id"
+    ((:param :id))
+    (lambda (tag-id)
+      (with-container (container conf)
+        (datum.tag:delete-tag (get-db container) tag-id)))
+    :method :delete)
+  (bind-route! app "/api/tag/:id/albums"
     ((:param :id))
     (lambda (tag-id)
       (with-container (container conf)

@@ -46,4 +46,3 @@
         opts {:params {:tag_ids (map :tag-id tags)}}]
     (go (<! (api/req ajax.core/PUT path opts))
         (k))))
-

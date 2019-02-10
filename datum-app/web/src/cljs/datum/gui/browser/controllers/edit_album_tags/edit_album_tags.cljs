@@ -80,26 +80,33 @@
   [components/loading-modal (:store store)])
 
 (defmethod component :editing [store_]
-  (let [store (:store store_)]
+  (let [{:keys [new existing]} (:store store_)]
     [components/editing-modal
-     {:on-save
-      #((-> store :save) (-> store :state))
+     {:new-tag
+      {:name      (-> new :name)
+       :on-change (-> new :change)
+       :on-create #((-> new :create) (-> new :name))
+       }
 
-      :on-cancel
-      (-> store :cancel)
-
-      :tag-states
-      (let [{:keys [tags attached-tag-set]} (-> store :state)]
+      :existing-tags
+      (let [{:keys [tags attached-tag-set]} (-> existing :state)]
         (map (fn [tag]
                (let [attached-p (datum.tag/attached-p attached-tag-set
                                                       tag)]
                  {:tag        tag
                   :attached-p attached-p
                   :on-toggle  (if attached-p
-                                (-> store :detach)
-                                (-> store :attach))
-                  :on-delete  nil}))
+                                (-> existing :detach)
+                                (-> existing :attach))
+                  :on-delete  #((-> existing :delete) existing %)
+                  }))
              tags))
+
+      :on-save
+      #((-> existing :save) (-> existing :state))
+
+      :on-cancel
+      (-> existing :cancel)
       }]))
 
 (defmethod component :saving [store]
