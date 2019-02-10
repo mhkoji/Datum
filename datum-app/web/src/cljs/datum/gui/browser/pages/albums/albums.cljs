@@ -34,7 +34,9 @@
     }
 
    :edit-album-tags
-   (edit-album-tags/closed-store update-store)
+   (edit-album-tags/closed-store
+    (fn [f]
+      (update-store #(update % :edit-album-tags f))))
    })
 
 

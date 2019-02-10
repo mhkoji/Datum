@@ -5,8 +5,6 @@
              :as editing]
             [datum.gui.browser.controllers.edit-album-tags.submitting
              :as submitting]
-            [datum.gui.browser.controllers.edit-album-tags.closed
-             :as closed]
             [datum.gui.browser.controllers.edit-album-tags.components
              :as components]))
 
@@ -19,8 +17,11 @@
    :store (loading/create-store
            (wrap update-store) album-id
            (fn [tags attached-tags]
-             (update-store
-              #(editing-store update-store tags attached-tags))))
+             ;; (update-store #(editing-store update-store
+             ;;                               tags
+             ;;                               attached-tags))
+             (js/console.log (str [tags attached-tags]))
+             ))
    })
 
 (defn editing-store [update-store tags attached-tags]
@@ -41,27 +42,37 @@
              (update-store #(closed-store update-store))))
    })
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defn closed-store [update-store]
   {:type :closed
-   :store (closed/create-store
-           (wrap update-store)
+   :store {:start
            (fn [album-id]
-             (update-store #(loadig-store album-id))))
+             (update-store #(loading-store update-store album-id)))}
    })
+
+
+(defmulti start
+  (fn [store album-id] (:type store)))
+
+(defmethod start :closed [store album-id]
+  ((:start (:store store)) album-id))
+
+(defmethod start :default [store album-id]
+  nil)
 
 
 (defmulti component
   (fn [store] (:type store)))
 
-
 (defmethod component :closed [store]
   nil)
 
 (defmethod component :loading [store]
-  [components/loading-modal])
+  [components/loading-modal (:store store)])
 
 
-(defmethod component  [store]
+(defmethod component :editing [store]
   [components/editing-modal (:store store)])
 
 

@@ -1,4 +1,6 @@
-(ns datum.gui.browser.controllers.edit-album-tags.components)
+(ns datum.gui.browser.controllers.edit-album-tags.components
+  (:require [reagent.core :as r]
+            [cljsjs.react-modal]))
 
 (defn modal-footer [{:keys [on-cancel on-save]}]
   [:div {:class "modal-footer"}
@@ -15,27 +17,36 @@
                :disabled (not on-save)}
       "Save"]]]])
 
-(defn loading-modal []
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn loading-component [{:keys [load-tags on-load-tags]}]
+  (r/create-class
+   {:component-did-mount
+    (fn [comp]
+      (load-tags))
+
+    :component-did-update
+    (fn [comp]
+      (let [{:keys [tags attached-tags]} (:state (r/props comp))]
+        (when (and tags attached-tags)
+          (on-load-tags tags attached-tags))))
+
+    :reagent-render
+    (fn []
+      [:div "Loading..."])}))
+
+(defn loading-modal [store]
   (r/create-element
    js/ReactModal
    #js {:isOpen true
-        :contentLabel "Tags"
-        :onRequestClose on-cancel}
+        ;; TODO: Should close request while loading?
+        :contentLabel "Tags"}
    (r/as-element
     [:div
-     [:div "Loading..."]
+     [loading-component store]
      [modal-footer]])))
 
-(defn submitting-modal []
-  (r/create-element
-   js/ReactModal
-   #js {:isOpen true
-        :contentLabel "Tags"
-        :onRequestClose on-cancel}
-   (r/as-element
-    [:div
-     [:div "Submitting..."]
-     [modal-footer]])))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn editing-modal []
   (r/create-element
@@ -47,11 +58,14 @@
     [:div
      [:div
       [:div {:class "input-group"}
-       [:input {:type "text" :class "form-control" :value (-> new :name)
+       [:input {:type "text"
+                :class "form-control"
+                :value (-> new :name)
                 :on-change #((-> new :on-change)
                              (.-value (.-target %)))}]
        [:div {:class "input-group-append"}
-        [:button {:type "button" :class"btn btn-primary"
+        [:button {:type "button"
+                  :class"btn btn-primary"
                   :on-click #((-> new :on-add))}
          [:span {:class "oi oi-plus"}]]]]
       [:ul {:class "list-group"}
@@ -66,6 +80,19 @@
           [:div {:class "float-right"}
            [:button {:type "button" :class "btn btn-danger btn-sm"
                      :on-click on-delete}
-            [:span {:class "oi oi-delete"}]]]]))]]
+            [:span {:class "oi oi-delete"}]]]])]]
 
-    [modal-footer])))
+    [modal-footer]])))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn submitting-modal []
+  (r/create-element
+   js/ReactModal
+   #js {:isOpen true
+        :contentLabel "Tags"
+        :onRequestClose on-cancel}
+   (r/as-element
+    [:div
+     [:div "Submitting..."]
+     [modal-footer]])))

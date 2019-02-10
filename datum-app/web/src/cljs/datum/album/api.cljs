@@ -1,9 +1,10 @@
 (ns datum.album.api
-  (:require [cljs.core.async :refer [chan go <! pipe]]
+  (:require [cljs.core.async :refer [go <! pipe]]
             [ajax.core]
             [datum.api :as api]
             [datum.image]
-            [datum.album]))
+            [datum.album]
+            [datum.tag]))
 
 (defn obj->image [x]
   (datum.image/Image. (x "image-id")))
@@ -30,3 +31,12 @@
   (let [path (str "/album/" album-id "/overview")]
     (go (let [x (<! (api/req ajax.core/GET path))]
           (k (obj->overview x))))))
+
+
+(defn obj->tag [x]
+  (datum.tag/Tag. (x "tag-id") (x "name")))
+
+(defn tags [album-id k]
+  (let [path (str "/album/" album-id "/tags")]
+    (go (let [xs (<! (api/req ajax.core/GET path))]
+          (k (map obj->tag xs))))))

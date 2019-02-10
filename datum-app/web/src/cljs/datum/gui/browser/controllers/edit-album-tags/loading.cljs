@@ -8,14 +8,10 @@
    :load-tags
    (fn []
      (datum.tag.api/tags (fn [tags]
-      (update-store
-       #(assoc-in % [:loading-tags :state :tags] tags))))
-     (datum.album.api/tags album-id (fn [tags]
-      (update-store
-       #(assoc-in % [:loading-tags :state :attach-tags] tags)))))
+      (update-store #(assoc-in % [:state :tags] tags))))
 
-   :on-loaded-tags
-   (fn [state]
-     (on-loaded (-> state :tags)
-                (-> state :attach-tags)))
+     (datum.album.api/tags album-id (fn [tags]
+      (update-store #(assoc-in % [:state :attached-tags] tags)))))
+
+   :on-load-tags on-loaded
    })
