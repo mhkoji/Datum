@@ -3,6 +3,8 @@
             [reagent.core :as r]
             [datum.album.show-overview]
             [datum.album.api]
+            [datum.gui.browser.controllers.edit-album-tags
+             :as edit-album-tags]
             [datum.gui.browser.components.header.state :as header]
             [datum.gui.browser.pages.album.components]
             [datum.gui.browser.url :as url]
@@ -29,6 +31,10 @@
            (datum.album.api/overview id k)))
 
        album-id))}
+
+   :edit-album-tags
+   (edit-album-tags/closed-store
+    (fn [f] (update-store #(update % :edit-album-tags f))))
    })
 
 (defn create-renderer [elem album-id]
@@ -41,6 +47,9 @@
                 (let [{:keys [state execute]} (-> store :show-overview)]
                   {:state state
                    :execute #(execute state album-id)})
+
+                :edit-album-tags
+                (-> store :edit-album-tags)
                 }]
               elem)))
 
