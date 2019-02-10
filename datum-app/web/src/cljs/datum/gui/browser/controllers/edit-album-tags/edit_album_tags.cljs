@@ -6,7 +6,9 @@
             [datum.gui.browser.controllers.edit-album-tags.submitting
              :as submitting]
             [datum.gui.browser.controllers.edit-album-tags.closed
-             :as closed]))
+             :as closed]
+            [datum.gui.browser.controllers.edit-album-tags.components
+             :as components]))
 
 (defn wrap [update-store]
   (fn [f]
@@ -51,5 +53,17 @@
 (defmulti component
   (fn [store] (:type store)))
 
+
+(defmethod component :closed [store]
+  nil)
+
 (defmethod component :loading [store]
-  (
+  [components/loading-modal])
+
+
+(defmethod component  [store]
+  [components/editing-modal (:store store)])
+
+
+(defmethod component :submitting [store]
+  [components/submitting-modal])

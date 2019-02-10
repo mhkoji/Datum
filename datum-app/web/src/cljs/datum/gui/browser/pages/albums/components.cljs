@@ -4,6 +4,8 @@
             [datum.gui.components.cards :as cards]
             [datum.gui.browser.components.header.reagent
              :refer [header-component]]
+            [datum.gui.browser.controllers.edit-album-tags
+             :as edit-album-tags]
             [datum.gui.browser.url :as url]))
 
 (defn cover-component [{:keys [cover on-click-tag-button]}]
@@ -70,4 +72,6 @@
               :on-click-tag-button #((-> edit-album-tags :store :start)
                                      (-> cover :album-id))}])]
 
-         [pager-component pager]]]])}))
+         [pager-component pager]
+
+         [edit-album-tags/component edit-album-tags]]]])}))
