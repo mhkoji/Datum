@@ -40,3 +40,10 @@
   (let [path (str "/album/" album-id "/tags")]
     (go (let [xs (<! (api/req ajax.core/GET path))]
           (k (map obj->tag xs))))))
+
+(defn put-tags [album-id tags k]
+  (let [path (str "/album/" album-id "/tags")
+        opts {:params {:tag_ids (map :tag-id tags)}}]
+    (go (<! (api/req ajax.core/PUT path opts))
+        (k))))
+

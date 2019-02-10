@@ -6,12 +6,13 @@
 (defrecord AttachedTagSet [tags])
 
 (defn attach [attached-tag-set tag]
-  (update attach-tag-set :tags conj tag))
+  (update attached-tag-set :tags conj tag))
 
 (defn detach [attached-tag-set tag]
   (let [tag-id        (-> tag :tag-id)
         attached-tags (-> attached-tag-set :tags)]
-    (remove #(= tag-id (-> % :tag-id)) attach-tags)))
+    (AttachedTagSet. (remove #(= tag-id (-> % :tag-id))
+                             attached-tags))))
 
 (defn attached-p [attached-tag-set tag]
   (let [tag-id       (-> tag :tag-id)

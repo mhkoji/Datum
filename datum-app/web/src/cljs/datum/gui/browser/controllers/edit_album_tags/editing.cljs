@@ -3,7 +3,7 @@
 
 (defn create-store [update-store
                     tags attached-tags
-                    on-submitted on-cancelled]
+                    on-saved on-cancelled]
   {:state
    {:tags             tags
     :attached-tag-set (tag/AttachedTagSet. attached-tags)}
@@ -18,10 +18,9 @@
      (update-store
       #(update-in % [:state :attached-tag-set] tag/detach tag)))
 
-    :submit
+   :save
    (fn [state]
-     (on-submitted (-> state :tags)
-                   (-> state :attached-tag-set :tags)))
+     (on-saved (-> state :attached-tag-set :tags)))
 
    :cancel
    on-cancelled

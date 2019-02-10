@@ -22,8 +22,7 @@
 (defn loading-component [{:keys [load-tags on-load-tags]}]
   (r/create-class
    {:component-did-mount
-    (fn [comp]
-      (load-tags))
+    (fn [_] (load-tags))
 
     :component-did-update
     (fn [comp]
@@ -38,17 +37,17 @@
 (defn loading-modal [store]
   (r/create-element
    js/ReactModal
+   ;; TODO: Should handle close request while loading?
    #js {:isOpen true
-        ;; TODO: Should close request while loading?
         :contentLabel "Tags"}
    (r/as-element
     [:div
      [loading-component store]
-     [modal-footer]])))
+     [modal-footer {}]])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn editing-modal []
+(defn editing-modal [{:keys [on-save on-cancel tag-states]}]
   (r/create-element
    js/ReactModal
    #js {:isOpen true
@@ -60,39 +59,50 @@
       [:div {:class "input-group"}
        [:input {:type "text"
                 :class "form-control"
-                :value (-> new :name)
-                :on-change #((-> new :on-change)
+                :value ""
+                :on-change #(js/console.log
                              (.-value (.-target %)))}]
        [:div {:class "input-group-append"}
         [:button {:type "button"
                   :class"btn btn-primary"
-                  :on-click #((-> new :on-add))}
+                  :on-click nil}
          [:span {:class "oi oi-plus"}]]]]
+
       [:ul {:class "list-group"}
-       (for [tag tags]
+       (for [{:keys [tag attached-p
+                     on-toggle on-delete]} tag-states]
          ^{:key (:tag-id tag)}
          [:li {:class "list-group-item"}
           [:label
            [:input {:type "checkbox"
-                    :checked (datum.tag/attached-p attached-tag-set tag)
-                    :on-change on-toggle}]
+                    :checked attached-p
+                    :on-change #(on-toggle tag)}]
            (:name tag)]
           [:div {:class "float-right"}
            [:button {:type "button" :class "btn btn-danger btn-sm"
                      :on-click on-delete}
             [:span {:class "oi oi-delete"}]]]])]]
 
-    [modal-footer]])))
+    [modal-footer {:on-save on-save :on-cancel on-cancel}]])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn submitting-modal []
+(defn saving-component [{:keys [submit]}]
+  (r/create-class
+   {:component-did-mount
+    (fn [_] (submit))
+
+    :reagent-render
+    (fn []
+      [:div "Saving..."])}))
+
+(defn saving-modal [store]
   (r/create-element
    js/ReactModal
+   ;; TODO: Should handle close request while saving?
    #js {:isOpen true
-        :contentLabel "Tags"
-        :onRequestClose on-cancel}
+        :contentLabel "Tags"}
    (r/as-element
     [:div
-     [:div "Submitting..."]
-     [modal-footer]])))
+     [saving-component store]
+     [modal-footer {}]])))
