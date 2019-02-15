@@ -8,6 +8,13 @@
              :refer [header-component]]
             [datum.gui.browser.url :as url]))
 
+(defn image-component [{:keys [image album-id]}]
+  [:div {:class "col-md-4"}
+   [:div {:class "card mb-4 box-shadow"}
+    [:a {:href (url/album-viewer-single album-id image)}
+     [:img {:class "card-img-top"
+            :src (url/image image)}]]]])
+
 (defn page [{:keys [header show-overview]}]
   (r/create-class
    {:component-did-mount
@@ -28,17 +35,16 @@
           (if-let [pictures (-> overview :pictures)]
             [:container
              [:div
+              [edit-album-tags/component edit-album-tags]
               [:p [tag/button {:on-click
                                #(edit-album-tags/start
                                  edit-album-tags album-id)}]]]
 
-             (cards/card-decks 4 pictures :image-id
-              (fn [image]
-                [:div {:class "col-md-4"}
-                 [:div {:class "card mb-4 box-shadow"}
-                  [:a {:href (url/album-viewer-single album-id image)}
-                   [:img {:class "card-img-top"
-                          :src (url/image image)}]]]]))
-
-             [edit-album-tags/component edit-album-tags]]
+             [cards/card-decks
+              (map (fn [image]
+                     {:key      (:image-id image)
+                      :album-id album-id
+                      :image    image})
+                   pictures)
+              :key 4 image-component]]
             [:div "Loading..."])])])}))

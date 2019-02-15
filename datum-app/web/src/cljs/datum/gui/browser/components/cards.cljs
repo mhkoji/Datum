@@ -1,6 +1,6 @@
 (ns datum.gui.components.cards)
 
-(defn card-decks [num% items item-key item-render]
+(defn card-decks [items item-key num% item-render]
   (let [count (count items)]
     (let [num (min num% count)
           group (group-by first

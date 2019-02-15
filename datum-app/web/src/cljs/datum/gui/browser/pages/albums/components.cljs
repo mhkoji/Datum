@@ -44,35 +44,39 @@
     [link next ^{:key "next"} [icon-next]]]])
 
 
-(defn page [{:keys [header pager show-covers]}]
+(defn page [{:keys [header pager show-covers edit-album-tags]}]
   (r/create-class
    {:component-did-mount
     (fn [comp]
       ((-> show-covers :execute)))
 
     :reagent-render
-    (fn [{:keys [nav show-covers edit-album-tags]}]
+    (fn [{:keys [header pager show-covers edit-album-tags]}]
       [:div
        ;; header
        [header-component header]
 
        [:main {:class "pt-3 px-4"}
         [:h1 {:class "h2"} "Albums"]
+
+        [edit-album-tags/component edit-album-tags]
+
         ;; covers
         [:main {:class "pt-3 px-4"}
-         (when (-> show-covers :state :loading)
-           [:div "Loading..."])
 
          [pager-component pager]
 
-         [cards/card-decks 4 (-> show-covers :state :covers) :album-id
-          (fn [cover]
-            (let [album-id (-> cover :album-id)]
-              [cover-component
-               {:cover cover
-                :on-click-tag-button
-                #(edit-album-tags/start edit-album-tags album-id)}]))]
+         [cards/card-decks
+          (map (fn [cover]
+                 (let [album-id (-> cover :album-id)]
+                   {:key   album-id
+                    :cover cover
+                    :on-click-tag-button
+                    #(edit-album-tags/start edit-album-tags album-id)}))
+               (-> show-covers :state :covers))
+          :key 4 cover-component]
 
-         [pager-component pager]
+         [pager-component pager]]]])
+    }))
 
-         [edit-album-tags/component edit-album-tags]]]])}))
+
