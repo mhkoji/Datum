@@ -34,7 +34,7 @@
 
 
 (defn obj->tag [x]
-  (datum.tag/Tag. (x "tag-id") (x "name")))
+  (datum.tag/Tag. (str (x "tag-id")) (x "name")))
 
 (defn tags [album-id k]
   (let [path (str "/album/" album-id "/tags")]

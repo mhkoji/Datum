@@ -4,7 +4,8 @@
             [datum.gui.browser.pages.album]
             [datum.gui.browser.pages.album.view]
             [datum.gui.browser.pages.albums]
-            [datum.gui.browser.pages.tags]))
+            [datum.gui.browser.pages.tags]
+            [datum.gui.browser.pages.tag]))
 
 (def *routes*
   ["/"
@@ -16,6 +17,9 @@
 
     "albums"
     datum.gui.browser.pages.albums/render-loop
+
+    ["tag/" :tag-id]
+    datum.gui.browser.pages.tag/render-loop
 
     "tags"
     datum.gui.browser.pages.tags/render-loop

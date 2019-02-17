@@ -7,7 +7,7 @@
             [datum.tag]))
 
 (defn obj->tag [x]
-  (datum.tag/Tag. (x "tag-id") (x "name")))
+  (datum.tag/Tag. (str (x "tag-id")) (x "name")))
 
 (defn tags [k]
   (go (let [xs (<! (api/req ajax.core/GET "/tags"))]
