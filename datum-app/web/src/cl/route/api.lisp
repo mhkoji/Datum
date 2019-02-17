@@ -92,6 +92,7 @@
       (with-container (container conf)
         (let ((tag (car (datum.tag:load-tags-by-ids (get-db container)
                                                     (list tag-id)))))
-          (datum.tag:tag-contents tag
-                                  (get-db container)
-                                  (get-album-loader container)))))))
+          (let ((albums (datum.tag:tag-contents tag
+                         (get-db container)
+                         (get-album-loader container))))
+            (mapcar #'datum.album:album-cover albums)))))))

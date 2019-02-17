@@ -17,6 +17,9 @@
 (defn tags []
   "/tags")
 
+(defn tag-contents [tag]
+  (str "/tag/" (:tag-id tag)))
+
 
 (defn image [image]
   (str "/api/image/" (-> image :image-id)))

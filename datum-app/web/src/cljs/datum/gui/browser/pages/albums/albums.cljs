@@ -76,4 +76,5 @@
         count
         (read-string (.get query-data "count" "500"))]
     (util/render-loop {:create-store create-store
-                       :render (create-renderer elem offset count)})))
+                       :render       (create-renderer elem offset count)
+                       })))
