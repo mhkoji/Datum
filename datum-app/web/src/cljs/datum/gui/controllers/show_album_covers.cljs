@@ -5,9 +5,15 @@
   (covers [this k]))
 
 (defprotocol Transaction
-  (update-state [this f]))
+  (update-context [this f]))
 
-(defrecord Context [transaction api])
+(defrecord State [type covers])
+
+(defrecord Context [state transaction api])
+
+(defn update-state [context f]
+  (update-context (-> context :transaction) #(update % :state f)))
+
 
 (defn call-partitioned [xs on-processing on-finished]
   (go (loop [[sub-xs & rest] (partition 100 100 [] xs)]
@@ -18,14 +24,12 @@
               (recur rest))))))
 
 (defn run [context]
-  (let [{:keys [transaction api]} context]
-    (update-state transaction
-     (fn [_] {:type :loading :covers []}))
-    (covers api
-     (fn [covers]
-       (update-state transaction #(assoc % :type :appending))
-       (call-partitioned covers
-        (fn [sub]
-          (update-state transaction #(update % :covers concat sub)))
-        (fn []
-          (update-state transaction #(assoc % :type :finished))))))))
+  (update-state context #(State. :loading []))
+  (covers (-> context :api)
+   (fn [covers]
+     (update-state context #(assoc % :type :appending))
+     (call-partitioned covers
+      (fn [sub]
+        (update-state context #(update % :covers concat sub)))
+      (fn []
+        (update-state context #(assoc % :type :finished)))))))

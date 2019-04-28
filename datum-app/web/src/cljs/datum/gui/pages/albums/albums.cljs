@@ -12,39 +12,37 @@
             [datum.gui.url :as url]
             [datum.gui.pages.util :as util]))
 
-(defn create-store [update-store offset count]
+(defn create-truth [update-truth offset count]
   {:pager
    {:offset offset :count count}
 
    :show-album-covers
-   {:state nil
+   (show-album-covers/Context.
+    nil
 
-    :context
-    (show-album-covers/Context.
-     (reify show-album-covers/Transaction
-       (show-album-covers/update-state [_ f]
-         (update-store #(update-in % [:show-album-covers :state] f))))
+    (reify show-album-covers/Transaction
+      (show-album-covers/update-context [_ f]
+        (update-truth #(update % :show-album-covers f))))
 
-     (reify show-album-covers/Api
-       (show-album-covers/covers [_ k]
-         (datum.album.api/covers offset count k))))
-    }
+    (reify show-album-covers/Api
+      (show-album-covers/covers [_ k]
+        (datum.album.api/covers offset count k))))
 
    :edit-album-tags
    (edit-album-tags/closed-store
     (fn [f]
-      (update-store #(update % :edit-album-tags f))))
+      (update-truth #(update % :edit-album-tags f))))
    })
 
 
 (defn create-renderer [elem]
-  (fn [store]
+  (fn [truth]
     (r/render [datum.gui.pages.albums.components/page
                {:header
                 (header/get-state :album)
 
                 :pager
-                (let [{:keys [offset count]} (-> store :pager)]
+                (let [{:keys [offset count]} (-> truth :pager)]
                   {:prev (if (<= count offset)
                            {:link (url/albums (- offset count) count)
                             :enabled true}
@@ -54,10 +52,10 @@
                           :enabled true}})
 
                 :show-album-covers
-                (-> store :show-album-covers)
+                (-> truth :show-album-covers)
 
                 :edit-album-tags
-                (-> store :edit-album-tags)
+                (-> truth :edit-album-tags)
                 }]
               elem)))
 
@@ -71,5 +69,5 @@
         (read-string (.get query-data "offset" "0"))
         count
         (read-string (.get query-data "count" "500"))]
-    (util/render-loop {:create-store #(create-store % offset count)
+    (util/render-loop {:create-store #(create-truth % offset count)
                        :render (create-renderer elem)})))

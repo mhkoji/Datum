@@ -35,7 +35,7 @@
   (r/create-class
    {:component-did-mount
     (fn [comp]
-      (show-album-covers/run (-> show-album-covers :context)))
+      (show-album-covers/run show-album-covers))
 
     :reagent-render
     (fn [{:keys [header pager show-album-covers edit-album-tags]}]
