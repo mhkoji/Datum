@@ -21,8 +21,7 @@ $ make
 
 ```
 $ cd datum-app/web
-$ mkdir target
-$ mkdir -p /tmp/datum/thubmanils/
+$ mkdir -p ./target/thumbnails
 $ sbcl
 CL-USER> (defvar *conf*
            (datum.container:make-configure
@@ -34,7 +33,7 @@ CL-USER> (defvar *conf*
                                        :database-name
                                        "./target/db.sqlite3.bin"))
             :thumbnail-root
-            "/tmp/datum/thubmanils/"))
+            (merge-pathnames "./target/thumbnails/")))
 CL-USER> (datum.app.cli:save-albums "./resources/contents/"
                                     :conf *conf*
                                     :initialize-data-p t)

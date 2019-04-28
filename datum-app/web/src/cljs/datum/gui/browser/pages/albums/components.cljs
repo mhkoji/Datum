@@ -1,30 +1,15 @@
 (ns datum.gui.browser.pages.albums.components
   (:require [reagent.core :as r]
-            [datum.gui.components.tag :as tag]
-            [datum.gui.components.cards :as cards]
+            [datum.gui.browser.components.album
+             :as album-components]
+            [datum.gui.browser.components.loading
+             :as loading-components]
             [datum.gui.browser.components.header.reagent
              :refer [header-component]]
+            [datum.gui.browser.controllers.show-album-covers
+             :as show-album-covers]
             [datum.gui.browser.controllers.edit-album-tags
-             :as edit-album-tags]
-            [datum.gui.browser.url :as url]))
-
-(defn cover-component [{:keys [cover on-click-tag-button]}]
-  (let [link (url/album (-> cover :album-id))]
-    [:div {:class "card mb-4 box-shadow" :style {:maxWidth "18rem"}}
-     [:a {:href link}
-      [:img {:src (url/image (-> cover :thumbnail))
-             :class "card-img-top"}]]
-
-     [:div {:class "card-body"}
-      [:div {:class "card-title"} (-> cover :name)]
-      [:a {:href link
-           :class "btn btn-secondary btn-sm"
-           :type "button"}
-       "Open"]
-      [:div ]
-      (when on-click-tag-button
-        [:p [tag/button {:on-click on-click-tag-button}]])]]))
-
+             :as edit-album-tags]))
 
 (defn link [{:keys [link enabled]} & children]
   [:a {:href link
@@ -44,14 +29,17 @@
     [link next ^{:key "next"} [icon-next]]]])
 
 
-(defn page [{:keys [header pager show-covers edit-album-tags]}]
+(defn page [{:keys [header pager
+                    show-album-covers
+                    edit-album-tags]}]
   (r/create-class
    {:component-did-mount
     (fn [comp]
-      ((-> show-covers :execute)))
+      (show-album-covers/run (-> show-album-covers :transaction)
+                             (-> show-album-covers :api)))
 
     :reagent-render
-    (fn [{:keys [header pager show-covers edit-album-tags]}]
+    (fn [{:keys [header pager show-album-covers edit-album-tags]}]
       [:div
        ;; header
        [header-component header]
@@ -64,19 +52,21 @@
         ;; covers
         [:main {:class "pt-3 px-4"}
 
-         [pager-component pager]
+         (let [{:keys [type covers]} (-> show-album-covers :state)]
+           (if (= type :loading)
+             "Loading..."
+             [:div
+              [pager-component pager]
 
-         [cards/card-decks
-          (map (fn [cover]
-                 (let [album-id (-> cover :album-id)]
-                   {:key   album-id
-                    :cover cover
-                    :on-click-tag-button
-                    #(edit-album-tags/start edit-album-tags album-id)}))
-               (-> show-covers :state :covers))
-          :key 4 cover-component]
+              (cond (= type :appending)
+                    [album-components/covers-component covers nil]
 
-         [pager-component pager]]]])
+                    (= type :finished)
+                    (if (empty? covers)
+                      "EMPTY!"
+                      [album-components/covers-component
+                       covers
+                       #(edit-album-tags/start edit-album-tags %)]))
+
+              [pager-component pager]]))]]])
     }))
-
-
