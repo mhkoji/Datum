@@ -1,4 +1,16 @@
-(ns datum.gui.components.tag)
+(ns datum.gui.components.tag
+  (:require [datum.gui.url :as url]))
+
+(defn menu-component [{:keys [items]}]
+  [:ul {:class "nav nav-tabs"}
+   (for [{:keys [id url name selected-p]} items]
+     ^{:key id}
+     [:li {:class "nav-item"}
+      [:a {:class (str "nav-link" (if selected-p " active" ""))
+           :href url}
+       name]])])
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn button [{:keys [on-click]}]
   [:button {:type "button"

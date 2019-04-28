@@ -21,7 +21,7 @@
                 :output-dir "resources/compiled/cljs/out"
                 :asset-path "/resources/compiled/cljs/out"
                 :optimizations :none
-                :main datum.gui.browser.main
+                :main datum.gui.pages.main
                 :pretty-print true}}
     :prod
     {:source-paths ["src/cljs/datum/"]
