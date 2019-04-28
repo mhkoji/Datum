@@ -19,15 +19,15 @@
    :show-album-covers
    {:state nil
 
-    :transaction
-    (reify show-album-covers/Transaction
-      (show-album-covers/update-state [_ f]
-        (update-store #(update-in % [:show-album-covers :state] f))))
+    :context
+    (show-album-covers/Context.
+     (reify show-album-covers/Transaction
+       (show-album-covers/update-state [_ f]
+         (update-store #(update-in % [:show-album-covers :state] f))))
 
-    :api
-    (reify show-album-covers/Api
-      (show-album-covers/covers [_ k]
-        (datum.album.api/covers offset count k)))
+     (reify show-album-covers/Api
+       (show-album-covers/covers [_ k]
+         (datum.album.api/covers offset count k))))
     }
 
    :edit-album-tags
