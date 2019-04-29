@@ -23,6 +23,7 @@ $ make
 $ cd datum-app/web
 $ mkdir -p ./target/thumbnails
 $ sbcl
+CL-USER> (ql:quickload '(:datum-app-cli :datum-app-web))
 CL-USER> (defvar *conf*
            (datum.container:make-configure
             :id-generator
@@ -34,9 +35,9 @@ CL-USER> (defvar *conf*
                                        "./target/db.sqlite3.bin"))
             :thumbnail-root
             (merge-pathnames "./target/thumbnails/")))
-CL-USER> (datum.app.cli:save-albums "./resources/contents/"
-                                    :conf *conf*
-                                    :initialize-data-p t)
+CL-USER> (datum.app.cli:initialize :conf *conf*)
+CL-USER> (datum.app.cli.album:add-albums "./resources/contents/"
+                                          :conf *conf*)
 CL-USER> (datum.app.web:start :conf *conf*)
 ```
 

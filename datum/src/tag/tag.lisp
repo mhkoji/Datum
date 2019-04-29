@@ -1,6 +1,10 @@
 (defpackage :datum.tag
   (:use :cl)
-  (:export :tag
+  (:export :container-db
+           :container-content-loader
+           :load-contents
+
+           :tag
            :tag-id
            :tag-name
            :tag-contents
@@ -16,6 +20,10 @@
            :content-set-tags))
 (in-package :datum.tag)
 
+(defgeneric container-db (c))
+(defgeneric container-content-loader (c))
+
+
 (defstruct tag
   id
   name)
@@ -27,22 +35,40 @@
 (defgeneric load-contents (loader type content-ids))
 
 
-(defun save-tag (db name)
-  (let ((tag-row (datum.tag.db:insert-tag-row db name)))
-    (make-tag :id (datum.tag.db:tag-row-tag-id tag-row)
-              :name (datum.tag.db:tag-row-name tag-row))))
+(defun save-tag (container name)
+  (let ((db (container-db container)))
+    (let ((tag-row (datum.tag.db:insert-tag-row db name)))
+      (make-tag :id (datum.tag.db:tag-row-tag-id tag-row)
+                :name (datum.tag.db:tag-row-name tag-row)))))
 
-
-(defun delete-tag (db tag-id)
-  (let ((tag-ids (list tag-id)))
+(defun delete-tag (container tag-id)
+  (let ((tag-ids (list tag-id))
+        (db (container-db container)))
     (datum.tag.db:delete-tag-content-rows-by-tags db tag-ids)
     (datum.tag.db:delete-tag-rows db tag-ids))
   (values))
 
+(defun row->tag (row)
+  (make-tag :id (datum.tag.db:tag-row-tag-id row)
+            :name (datum.tag.db:tag-row-name row)))
 
-(defun tag-contents (tag db loader)
+(defun load-tags-by-range (container offset count)
+  (mapcar #'row->tag
+          (datum.tag.db:select-tag-rows
+           (container-db container)
+           offset
+           count)))
+
+(defun load-tags-by-ids (container tag-ids)
+  (mapcar #'row->tag
+          (datum.tag.db:select-tag-rows-in
+           (container-db container)
+           tag-ids)))
+
+
+(defun tag-contents (container tag)
   (let ((content-rows (datum.tag.db:select-tag-content-rows
-                       db
+                       (container-db container)
                        (tag-id tag)))
         (content-id->content (make-hash-table :test #'equal)))
     (let ((type->content-ids (make-hash-table)))
@@ -52,7 +78,7 @@
               (content-id (datum.tag.db:tag-content-row-content-id row)))
           (push content-id (gethash type type->content-ids))))
       (loop for type being the hash-keys of type->content-ids
-            for contents = (load-contents loader
+            for contents = (load-contents (container-content-loader container)
                                           type
                                           (gethash type type->content-ids))
             do (dolist (content contents)
@@ -65,35 +91,21 @@
             when content
          collect content))))
 
-
-(defun row->tag (row)
-  (make-tag :id (datum.tag.db:tag-row-tag-id row)
-            :name (datum.tag.db:tag-row-name row)))
-
-(defun load-tags-by-range (db offset count)
-  (mapcar #'row->tag
-          (datum.tag.db:select-tag-rows db offset count)))
-
-(defun load-tags-by-ids (db tag-ids)
-  (mapcar #'row->tag
-          (datum.tag.db:select-tag-rows-in db tag-ids)))
-
-
-
-(defun content-tags (content db)
+(defun content-tags (container content)
   (mapcar #'row->tag
           (datum.tag.db:select-tag-rows-by-content
-           db
+           (container-db container)
            (content-id content))))
 
-(defun content-set-tags (content tags db)
-  (let ((content-ids (list (content-id content))))
-    (datum.tag.db:delete-tag-content-rows-by-contents db content-ids))
-  (let ((rows (mapcar (lambda (tag)
-                        (datum.tag.db:make-tag-content-row
-                         :tag-id (tag-id tag)
-                         :content-id (content-id content)
-                         :content-type (content-type content)))
-                      tags)))
-    (datum.tag.db:insert-tag-content-rows db rows))
+(defun content-set-tags (container content tags)
+  (let ((db (container-db container)))
+    (let ((content-ids (list (content-id content))))
+      (datum.tag.db:delete-tag-content-rows-by-contents db content-ids))
+    (let ((rows (mapcar (lambda (tag)
+                          (datum.tag.db:make-tag-content-row
+                           :tag-id (tag-id tag)
+                           :content-id (content-id content)
+                           :content-type (content-type content)))
+                        tags)))
+      (datum.tag.db:insert-tag-content-rows db rows)))
   (values))

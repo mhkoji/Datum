@@ -2,13 +2,10 @@
   (:use :cl)
   (:export :make-configure
            :load-configure
-
+           :configure-thumbnail-root
+           :configure-id-generator
            :with-container
-           :get-db
-           :get-id-generator
-           :get-image-repository
-           :get-album-loader
-           :get-thumbnail-file-fn))
+           :container-db))
 (in-package :datum.container)
 
 (defstruct configure
@@ -23,40 +20,43 @@
     (with-open-file (in path) (read in))))
 
 
-(defstruct container db id-generator thumbnail-root)
-
-(defun get-db (c)
-  (container-db c))
-
-(defun get-id-generator (c)
-  (container-id-generator c))
-
-(defun get-image-repository (c)
-  (datum.image:make-repository :db (get-db c)))
-
-(defun get-album-loader (c)
-  (datum.album:make-loader
-   :db (get-db c)
-   :thumbnail-repository (get-image-repository c)))
-
-(defun get-thumbnail-file-fn (c)
-  (labels ((make-thumbnail-path (source-path)
-             (format nil "~Athumbnail$~A"
-                     (container-thumbnail-root c)
-                     (cl-ppcre:regex-replace-all "/" source-path "$")))
-           (make-thumbnail-file (source-path)
-             (log:debug "Creating thumbnail for: ~A" source-path)
-             (let ((thumbnail-path (make-thumbnail-path source-path)))
-               (datum.fs.thumbnail:ensure-exists thumbnail-path source-path)
-               thumbnail-path)))
-    #'make-thumbnail-file))
-
+(defstruct container db)
 
 (defmacro with-container ((container conf) &body body)
   `(datum.db:with-db (db (configure-db-factory ,conf))
-     (let ((,container
-            (make-container
-             :db db
-             :id-generator (configure-id-generator ,conf)
-             :thumbnail-root (configure-thumbnail-root ,conf))))
+     (let ((,container (make-container :db db)))
        ,@body)))
+
+(defun make-image-repository (c)
+  (datum.image:make-repository :db (container-db c)))
+
+
+(defmethod datum.image:container-db ((c container))
+  (container-db c))
+
+
+(defmethod datum.album:container-db ((c container))
+  (container-db c))
+
+(defmethod datum.album:container-thumbnail-repository ((c container))
+  (make-image-repository c))
+
+(defmethod datum.album:container-entity-repository ((c container))
+  (make-image-repository c))
+
+
+(defmethod datum.tag:container-db ((c container))
+  (container-db c))
+
+(defmethod datum.tag:container-content-loader ((c container))
+  c)
+
+(defmethod datum.tag:load-contents ((loader container)
+                                    (type (eql :album))
+                                    (content-ids list))
+  (datum.album:load-albums-by-ids loader content-ids))
+
+(defmethod datum.tag:load-contents ((loader hash-table)
+                                    type
+                                    content-ids)
+  (datum.tag:load-contents (gethash type loader) type content-ids))

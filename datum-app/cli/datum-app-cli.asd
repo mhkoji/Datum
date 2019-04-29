@@ -2,6 +2,9 @@
   :serial t
   :pathname "src"
   :components
-  ((:file "save-albums")
-   (:file "cli"))
+  ((:file "cli")
+   (:file "album/album")
+   (:file "album/add-albums")
+   (:file "image")
+   (:file "tag"))
   :depends-on (:datum))

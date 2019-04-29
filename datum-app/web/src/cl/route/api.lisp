@@ -15,84 +15,46 @@
 (defun bind-album (app conf)
   (bind-route! app "/api/album/covers"
     ((:query "offset") (:query "count"))
-    (lambda (offset count)
-      (with-container (container conf)
-        (let ((albums (datum.album:load-albums-by-range
-                       (get-album-loader container)
-                       (or offset 0)
-                       (or count 500))))
-          (mapcar #'datum.album:album-cover albums)))))
-  (labels ((load-album-by-id (loader album-id)
-             (car (datum.album:load-albums-by-ids
-                   loader
-                   (list album-id)))))
-    (bind-route! app "/api/album/:id/overview"
-      ((:param :id))
-      (lambda (album-id)
-        (with-container (container conf)
-          (let ((album (load-album-by-id (get-album-loader container)
-                                         album-id)))
-            (datum.album:album-overview album
-             (get-db container)
-             (get-image-repository container))))))
-    (bind-route! app "/api/album/:id/tags"
-      ((:param :id))
-      (lambda (album-id)
-        (with-container (container conf)
-          (let ((album (load-album-by-id (get-album-loader container)
-                                         album-id)))
-            (datum.tag:content-tags album (get-db container))))))
-    (bind-route! app "/api/album/:id/tags"
-      ((:param :id) (:query "tag_ids"))
-      (lambda (album-id tag-ids)
-        (with-container (container conf)
-          (let ((db (get-db container)))
-            (let ((album (load-album-by-id (get-album-loader container)
-                                           album-id))
-                  (tags (datum.tag:load-tags-by-ids db tag-ids)))
-              (datum.tag:content-set-tags album tags db))))
-        (values))
-      :method :put)))
-
+    (lambda (o c)
+      (datum.app.cli.album:covers conf o c)))
+  (bind-route! app "/api/album/:id/overview"
+    ((:param :id))
+    (lambda (id)
+      (datum.app.cli.album:overview conf id)))
+  (bind-route! app "/api/album/:id/tags"
+    ((:param :id))
+    (lambda (id)
+      (datum.app.cli.album:tags conf id)))
+  (bind-route! app "/api/album/:id/tags"
+    ((:param :id) (:query "tag_ids"))
+    (lambda (id tag-ids)
+      (datum.app.cli.album:set-tags conf id tag-ids))
+    :method :put))
 
 (defun bind-image (app conf)
   (bind-route! app "/api/image/:id"
     ((:param :id))
     (lambda (id)
-      (with-container (container conf)
-        (let ((image (car (datum.image:load-images-by-ids
-                           (get-image-repository container)
-                           (list id)))))
-          (datum.image:image-path image))))
+      (datum.app.cli.image:path conf id))
     :out #'as-file))
-
 
 (defun bind-tag (app conf)
   (bind-route! app "/api/tags"
     ()
     (lambda ()
-      (with-container (container conf)
-        (datum.tag:load-tags-by-range (get-db container) 0 50))))
+      (datum.app.cli.tag:tags conf)))
   (bind-route! app "/api/tags"
     ((:query "name"))
     (lambda (name)
-      (with-container (container conf)
-        (datum.tag:save-tag (get-db container) name)))
+      (datum.app.cli.tag:add-tag conf name))
     :method :put)
 
   (bind-route! app "/api/tag/:id"
     ((:param :id))
     (lambda (tag-id)
-      (with-container (container conf)
-        (datum.tag:delete-tag (get-db container) tag-id)))
+      (datum.app.cli.tag:delete-tag conf tag-id))
     :method :delete)
   (bind-route! app "/api/tag/:id/albums"
     ((:param :id))
     (lambda (tag-id)
-      (with-container (container conf)
-        (let ((tag (car (datum.tag:load-tags-by-ids (get-db container)
-                                                    (list tag-id)))))
-          (let ((albums (datum.tag:tag-contents tag
-                         (get-db container)
-                         (get-album-loader container))))
-            (mapcar #'datum.album:album-cover albums)))))))
+      (datum.app.cli.tag:album-covers conf tag-id))))

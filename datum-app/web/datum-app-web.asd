@@ -13,7 +13,7 @@
      (:file "asset")))
 
    (:file "web"))
-  :depends-on (:datum
+  :depends-on (:datum-app-cli
 
                :cl-who
                :cl-arrows
