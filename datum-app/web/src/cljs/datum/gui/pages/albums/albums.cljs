@@ -40,9 +40,8 @@
    })
 
 
-(defn create-renderer [elem]
-  (fn [truth]
-    (r/render [datum.gui.pages.albums.components/page truth] elem)))
+(defn render [truth elem]
+  (r/render [datum.gui.pages.albums.components/page truth] elem))
 
 (defn render-loop [elem _]
   (let [search
@@ -54,4 +53,4 @@
         count
         (read-string (.get query-data "count" "500"))]
     (util/render-loop {:create-store #(create-truth % offset count)
-                       :render (create-renderer elem)})))
+                       :render #(render % elem)})))

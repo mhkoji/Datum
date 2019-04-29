@@ -5,13 +5,17 @@
   (tags [this k]))
 
 (defprotocol Transaction
-  (update-state [this f]))
+  (update-context [this f]))
 
-(defrecord Context [transaction api selected-tag-id])
+(defrecord Context [state transaction api selected-tag-id])
+
+(defn update-state [context f]
+  (update-context (-> context :transaction) #(update % :state f)))
+
 
 (defn run [context]
-  (let [{:keys [transaction api selected-tag-id]} context]
-    (update-state (-> context :transaction)
+  (let [{:keys [api selected-tag-id]} context]
+    (update-state context
      (fn [_] {:items [{:id         "__all"
                        :name       "All"
                        :url        (url/tags)
@@ -24,4 +28,4 @@
                            :url        (url/tag-contents tag)
                            :selected-p (= (:tag-id tag) selected-tag-id)})
                         tags)]
-         (update-state transaction #(update % :items concat items)))))))
+         (update-state context #(update % :items concat items)))))))

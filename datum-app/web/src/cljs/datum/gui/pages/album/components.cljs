@@ -1,7 +1,8 @@
 (ns datum.gui.pages.album.components
   (:require [reagent.core :as r]
-            [datum.gui.controllers.edit-album-tags
-             :as edit-album-tags]
+            [datum.gui.controllers.show-album-overview
+             :as show-album-overview]
+            [datum.gui.controllers.edit-album-tags :as edit-album-tags]
             [datum.gui.components.tag :as tag]
             [datum.gui.components.cards :as cards]
             [datum.gui.components.header.reagent
@@ -15,18 +16,18 @@
      [:img {:class "card-img-top"
             :src (url/image image)}]]]])
 
-(defn page [{:keys [header show-overview]}]
+(defn page [{:keys [header show-album-overview]}]
   (r/create-class
    {:component-did-mount
     (fn [comp]
-      ((-> show-overview :execute)))
+      (show-album-overview/run show-album-overview))
 
     :reagent-render
-    (fn [{:keys [header show-overview edit-album-tags]}]
+    (fn [{:keys [header show-album-overview edit-album-tags]}]
       [:div
        [header-component header]
 
-       (let [overview (-> show-overview :state :overview)
+       (let [overview (-> show-album-overview :state :overview)
              album-id (-> overview :album-id)]
          [:main {:class "pt-3 px-4"}
           [:h1 {:class "h2"}
@@ -35,7 +36,7 @@
           (if-let [pictures (-> overview :pictures)]
             [:container
              [:div
-              [edit-album-tags/component edit-album-tags]
+              [edit-album-tags/modal edit-album-tags]
               [:p [tag/button {:on-click
                                #(edit-album-tags/start
                                  edit-album-tags album-id)}]]]

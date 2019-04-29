@@ -15,8 +15,8 @@
   (r/create-class
    {:component-did-mount
     (fn [comp]
-      (show-tags/run (-> show-tags :context))
-      (show-album-covers/run (-> show-album-covers :context)))
+      (show-tags/run show-tags)
+      (show-album-covers/run show-album-covers))
 
     :reagent-render
     (fn [{:keys [header show-tags show-album-covers]}]
@@ -46,39 +46,36 @@
    (header/get-state :tag)
 
    :show-tags
-   {:state nil
+   (show-tags/Context.
+    nil
 
-    :context
-    (show-tags/Context.
-     (reify show-tags/Transaction
-       (show-tags/update-state [_ f]
-         (update-store #(update-in % [:show-tags :state] f))))
+    (reify show-tags/Transaction
+      (show-tags/update-context [_ f]
+        (update-store #(update % :show-tags f))))
 
-     (reify show-tags/Api
-       (show-tags/tags [_ k]
-         (datum.tag.api/tags k)))
+    (reify show-tags/Api
+      (show-tags/tags [_ k]
+        (datum.tag.api/tags k)))
 
-     nil)
-    }
+    nil)
 
    :show-album-covers
-   {:state nil
+   (show-album-covers/Context.
+    nil
 
-    :context
-    (show-album-covers/Context.
-     (reify show-album-covers/Transaction
-       (show-album-covers/update-state [_ f]
-         (update-store #(update-in % [:show-album-covers :state] f))))
+    (reify show-album-covers/Transaction
+      (show-album-covers/update-context [_ f]
+        (update-store #(update % :show-album-covers f))))
 
-     (reify show-album-covers/Api
-       (show-album-covers/covers [_ k]
-         (datum.album.api/covers 0 100 k))))
-    }})
+    (reify show-album-covers/Api
+      (show-album-covers/covers [_ k]
+        (datum.album.api/covers 0 100 k))))
+   })
 
-(defn create-renderer [elem]
-  (fn [store] (r/render [page store] elem)))
+(defn renderer [store elem]
+  (r/render [page store] elem))
 
 (defn render-loop [elem _]
   (util/render-loop {:create-store create-store
-                     :render       (create-renderer elem)
+                     :render       #(renderer % elem)
                      }))
