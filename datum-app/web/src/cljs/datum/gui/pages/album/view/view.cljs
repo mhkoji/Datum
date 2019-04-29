@@ -3,7 +3,6 @@
             [goog.History]
             [goog.Uri]
             [reagent.core :as r]
-            [datum.album.api]
             [datum.gui.pages.album.view.single :as single]
             [datum.gui.pages.album.view.loading :as loading]
             [datum.gui.url :as url]
@@ -13,39 +12,39 @@
   (let [uri (goog.Uri. js/location.search)]
     (-> uri (.getQueryData) (.get "current"))))
 
-(defn viewer-store [update-store images]
-  {:type :viewer
-   :store (single/create-store
-           (fn [f] (update-store #(update % :store f)))
-           images
-           (get-initial-image-id))})
+(defn single-context [update-store album-id images index]
+  (let [state (single/State. images index nil)]
+    (single/Context. state update-store album-id)))
 
-(defn loading-store [update-store album-id]
-  {:type :loading
-   :store (loading/create-store
-           (fn [f] (update-store #(update % :store f)))
-           album-id
-           (fn [images]
-             (update-store #(viewer-store update-store images))))})
+(defn loading-context [update-store album-id]
+  (letfn [(handle-on-loaded [images]
+            (let [index-or-null
+                  (when-let [initial-image-id (get-initial-image-id)]
+                    (.indexOf (map :image-id images) initial-image-id))]
+              (update-store #(single-context update-store
+                                             album-id
+                                             images
+                                             (or index-or-null 0)))))]
+    (loading/Context. nil update-store album-id handle-on-loaded)))
 
 
-(defn get-uri []
+(defmulti render
+  (fn [context elem] (type context)))
+
+(defmethod render single/Context [context elem]
+  (r/render [single/page context] elem))
+
+(defmethod render loading/Context [context elem]
+  (r/render [loading/page context] elem))
+
+(defn get-uri [] ;; for SPA
   (goog.Uri.
    (let [hash (.-hash js/location)]
      (if (= hash "") "" (subs hash 1)))))
 
 (defn render-loop-internal [elem album-id]
-  (let [renderers {:viewer (single/create-renderer elem album-id)
-                   :loading (loading/create-renderer elem)}]
-    (util/render-loop {:create-store
-                       (fn [update-store]
-                         (loading-store update-store album-id))
-                       :render
-                       (fn [store]
-                         (let [render (renderers (:type store))]
-                           (render (:store store))))
-                       })))
-
+  (util/render-loop {:create-store #(loading-context % album-id)
+                     :render #(render % elem)}))
 
 (defn render-loop [elem {:keys [album-id]}]
   (let [history (goog.History.)]

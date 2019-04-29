@@ -1,7 +1,6 @@
 (ns datum.gui.components.viewer.single
   (:require  [goog.events :as gevents]
              [reagent.core :as r]
-             [datum.viewer :as viewer]
              [datum.gui.url :as url]
              [datum.gui.components.viewer.util :as util]
              [datum.gui.components.viewer.progress
