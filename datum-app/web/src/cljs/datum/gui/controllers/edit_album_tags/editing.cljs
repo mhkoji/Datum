@@ -2,52 +2,43 @@
   (:require [datum.tag :as tag]
             [datum.tag.api]))
 
-(defn create-store [update-store
-                    tags attached-tags
-                    on-saved on-cancelled]
-  {:existing
-   {:state
-    {:tags             tags
-     :attached-tag-set (tag/AttachedTagSet. attached-tags)}
+(defrecord State [tags attached-tag-set new-name])
 
-    :attach
-    (fn [tag]
-      (update-store #(update-in % [:existing :state :attached-tag-set]
-                                tag/attach tag)))
+(defrecord Context [state update-context on-save on-cancel])
 
-    :detach
-    (fn [tag]
-      (update-store #(update-in % [:existing :state :attached-tag-set]
-                                tag/detach tag)))
+(defn update-state [context f]
+  (let [update-context (:update-context context)]
+    (update-context #(update % :state f))))
 
-    :save
-    (fn [state]
-      (on-saved (-> state :attached-tag-set :tags)))
+(defn refresh-tags [context]
+  (datum.tag.api/tags
+   (fn [tags] (update-state context #(assoc % :tags tags)))))
 
-    :cancel
-    on-cancelled
+(defn attach-tag [context tag]
+  (update-state context #(update % :attached-tag-set tag/attach tag)))
+
+(defn detach-tag [context tag]
+  (update-state context #(update % :attached-tag-set tag/detach tag)))
+
+(defn delete-tag [context tag]
+  (detach-tag context tag)
+  (datum.tag.api/delete-tag tag #(refresh-tags context)))
 
 
-    :delete
-    (fn [existing tag]
-      ((-> existing :detach) tag)
-      (datum.tag.api/delete-tag tag (fn []
-        (datum.tag.api/tags (fn [tags]
-          (update-store #(assoc-in % [:existing :state :tags] tags)))))))
-    }
+(defn change-name [context name]
+  (update-state context #(assoc % :new-name name)))
 
-   :new
-   {:name ""
+(defn add-tag [context]
+  (let [name (-> context :state :new-name)]
+    (datum.tag.api/put-tags name
+     (fn [_]
+       (update-state context #(assoc % :new-name ""))
+       (refresh-tags context)))))
 
-    :change
-    (fn [name]
-      (update-store #(assoc-in % [:new :name] name)))
 
-    :create
-    (fn [name]
-      (update-store #(assoc-in % [:new :name] ""))
-      (datum.tag.api/put-tags name (fn []
-        (datum.tag.api/tags (fn [tags]
-          (update-store #(assoc-in % [:existing :state :tags] tags)))))))
-    }
-   })
+(defn save [context]
+  (let [{:keys [on-save state]} context]
+    (on-save (tag/attached-tags (-> state :attached-tag-set)))))
+
+(defn cancel [context]
+  ((:on-cancel context)))

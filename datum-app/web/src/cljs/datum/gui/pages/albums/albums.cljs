@@ -3,18 +3,22 @@
             [reagent.core :as r]
             [goog.Uri :as guri]
             [datum.album.api]
-            [datum.gui.controllers.show-album-covers
-             :as show-album-covers]
-            [datum.gui.controllers.edit-album-tags
-             :as edit-album-tags]
+            [datum.gui.controllers.show-album-covers :as show-album-covers]
+            [datum.gui.controllers.edit-album-tags :as edit-album-tags]
             [datum.gui.components.header.state :as header]
             [datum.gui.pages.albums.components]
             [datum.gui.url :as url]
             [datum.gui.pages.util :as util]))
 
 (defn create-truth [update-truth offset count]
-  {:pager
-   {:offset offset :count count}
+  {:header
+   (header/get-state :album)
+
+   :pager
+   {:prev (if (<= count offset)
+            {:link (url/albums (- offset count) count) :enabled true}
+            {:link ""                                  :enabled false})
+    :next {:link (url/albums (+ offset count) count) :enabled true}}
 
    :show-album-covers
    (show-album-covers/Context.
@@ -29,36 +33,16 @@
         (datum.album.api/covers offset count k))))
 
    :edit-album-tags
-   (edit-album-tags/closed-store
-    (fn [f]
-      (update-truth #(update % :edit-album-tags f))))
+   (edit-album-tags/ClosedContext.
+    (reify edit-album-tags/Transaction
+      (edit-album-tags/update-context [_ f]
+        (update-truth #(update % :edit-album-tags f)))))
    })
 
 
 (defn create-renderer [elem]
   (fn [truth]
-    (r/render [datum.gui.pages.albums.components/page
-               {:header
-                (header/get-state :album)
-
-                :pager
-                (let [{:keys [offset count]} (-> truth :pager)]
-                  {:prev (if (<= count offset)
-                           {:link (url/albums (- offset count) count)
-                            :enabled true}
-                           {:link ""
-                            :enabled false})
-                   :next {:link (url/albums (+ offset count) count)
-                          :enabled true}})
-
-                :show-album-covers
-                (-> truth :show-album-covers)
-
-                :edit-album-tags
-                (-> truth :edit-album-tags)
-                }]
-              elem)))
-
+    (r/render [datum.gui.pages.albums.components/page truth] elem)))
 
 (defn render-loop [elem _]
   (let [search

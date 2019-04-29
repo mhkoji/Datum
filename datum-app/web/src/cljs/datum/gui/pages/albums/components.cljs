@@ -1,15 +1,10 @@
 (ns datum.gui.pages.albums.components
   (:require [reagent.core :as r]
-            [datum.gui.components.album
-             :as album-components]
-            [datum.gui.components.loading
-             :as loading-components]
-            [datum.gui.components.header.reagent
-             :refer [header-component]]
-            [datum.gui.controllers.show-album-covers
-             :as show-album-covers]
-            [datum.gui.controllers.edit-album-tags
-             :as edit-album-tags]))
+            [datum.gui.components.album :as album-components]
+            [datum.gui.components.loading :as loading-components]
+            [datum.gui.components.header.reagent :refer [header-component]]
+            [datum.gui.controllers.show-album-covers :as show-album-covers]
+            [datum.gui.controllers.edit-album-tags :as edit-album-tags]))
 
 (defn link [{:keys [link enabled]} & children]
   [:a {:href link
@@ -46,26 +41,25 @@
        [:main {:class "pt-3 px-4"}
         [:h1 {:class "h2"} "Albums"]
 
-        [edit-album-tags/component edit-album-tags]
-
         ;; covers
         [:main {:class "pt-3 px-4"}
 
-         (let [{:keys [type covers]} (-> show-album-covers :state)]
-           (if (= type :loading)
+         (let [{:keys [status covers]} (-> show-album-covers :state)]
+           (if (= status :loading)
              "Loading..."
              [:div
               [pager-component pager]
 
-              (cond (= type :appending)
+              (cond (= status :appending)
                     [album-components/covers-component covers nil]
 
-                    (= type :finished)
+                    (= status :finished)
                     (if (empty? covers)
                       "EMPTY!"
-                      [album-components/covers-component
-                       covers
+                      [album-components/covers-component covers
                        #(edit-album-tags/start edit-album-tags %)]))
 
-              [pager-component pager]]))]]])
+              [pager-component pager]]))]]
+
+       [edit-album-tags/modal edit-album-tags]])
     }))

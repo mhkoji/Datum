@@ -1,113 +1,74 @@
 (ns datum.gui.controllers.edit-album-tags
-  (:require [datum.tag]
-            [datum.gui.controllers.edit-album-tags.loading
-             :as loading]
-            [datum.gui.controllers.edit-album-tags.editing
-             :as editing]
-            [datum.gui.controllers.edit-album-tags.saving
-             :as saving]
+  (:require [datum.tag :as tag]
+            [datum.gui.controllers.edit-album-tags.loading :as loading]
+            [datum.gui.controllers.edit-album-tags.editing :as editing]
+            [datum.gui.controllers.edit-album-tags.saving :as saving]
             [datum.gui.controllers.edit-album-tags.components
              :as components]))
 
-(defn wrap [update-store]
-  (fn [f]
-    (update-store #(update % :store f))))
+(defprotocol Transaction
+  (update-context [this f]))
 
-(declare loading-store
-         editing-store
-         saving-store
-         closed-store)
+(defrecord ClosedContext [transaction])
 
-(defn loading-store [update-store album-id]
-  {:type :loading
-   :store (loading/create-store
-           (wrap update-store) album-id
-           (fn [tags attached-tags]
-             (update-store #(editing-store update-store
-                                           album-id
-                                           tags
-                                           attached-tags))))
-   })
+(defn saving-context [tran album-id attached-tags]
+  (saving/Context.
+   (saving/State. ::saving/saving)
 
-(defn editing-store [update-store album-id
-                     tags attached-tags]
-  {:type :editing
-   :store (editing/create-store
-           (wrap update-store) tags attached-tags
-           (fn [attached-tags]
-             (update-store #(saving-store update-store
-                                          album-id
-                                          attached-tags)))
-           (fn []
-             (update-store #(closed-store update-store))))
-   })
+   #(update-context tran %)
 
-(defn saving-store [update-store album-id attached-tags]
-  {:type :saving
-   :store (saving/create-store
-           (wrap update-store) album-id attached-tags
-           (fn []
-             (update-store #(closed-store update-store))))
-   })
+   album-id
+
+   attached-tags
+
+   (fn []
+     (update-context tran #(ClosedContext. tran)))))
+
+(defn editing-context [tran album-id tags attached-tags]
+  (editing/Context.
+   (editing/State. tags (tag/AttachedTagSet. attached-tags) "")
+
+   #(update-context tran %)
+
+   (fn [attached-tags]
+     (update-context tran #(saving-context tran album-id attached-tags)))
+
+   (fn []
+     (update-context tran #(ClosedContext. tran)))))
+
+(defn loading-context [tran album-id]
+  (loading/Context.
+   nil
+
+   #(update-context tran %)
+
+   album-id
+
+   (fn [loading-state]
+     (update-context tran #(editing-context
+                            tran album-id
+                            (-> loading-state :tags)
+                            (-> loading-state :attached-tags))))))
+
+
+(defn start [context album-id]
+  (when (= (type context) ClosedContext)
+    (let [tran (:transaction context)]
+      (update-context tran #(loading-context tran album-id)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn closed-store [update-store]
-  {:type :closed
-   :store {:start
-           (fn [album-id]
-             (update-store #(loading-store update-store album-id)))}
-   })
+(defmulti modal
+  (fn [context] (type context)))
 
-
-(defmulti start
-  (fn [store album-id] (:type store)))
-
-(defmethod start :closed [store album-id]
-  ((:start (:store store)) album-id))
-
-(defmethod start :default [store album-id]
+(defmethod modal ClosedContext [context]
   nil)
 
+(defmethod modal loading/Context [context]
+  [components/loading-modal context])
 
-(defmulti component
-  (fn [store] (:type store)))
+(defmethod modal editing/Context [context]
+  [components/editing-modal context])
 
-(defmethod component :closed [store]
-  nil)
-
-(defmethod component :loading [store]
-  [components/loading-modal (:store store)])
-
-(defmethod component :editing [store_]
-  (let [{:keys [new existing]} (:store store_)]
-    [components/editing-modal
-     {:new-tag
-      {:name      (-> new :name)
-       :on-change (-> new :change)
-       :on-create #((-> new :create) (-> new :name))
-       }
-
-      :existing-tags
-      (let [{:keys [tags attached-tag-set]} (-> existing :state)]
-        (map (fn [tag]
-               (let [attached-p (datum.tag/attached-p attached-tag-set
-                                                      tag)]
-                 {:tag        tag
-                  :attached-p attached-p
-                  :on-toggle  (if attached-p
-                                (-> existing :detach)
-                                (-> existing :attach))
-                  :on-delete  #((-> existing :delete) existing %)
-                  }))
-             tags))
-
-      :on-save
-      #((-> existing :save) (-> existing :state))
-
-      :on-cancel
-      (-> existing :cancel)
-      }]))
-
-(defmethod component :saving [store]
-  [components/saving-modal (:store store)])
+(defmethod modal saving/Context [context]
+  [components/saving-modal context])

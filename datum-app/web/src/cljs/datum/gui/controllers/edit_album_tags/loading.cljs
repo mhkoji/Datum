@@ -2,16 +2,21 @@
   (:require [datum.tag.api]
             [datum.album.api]))
 
-(defn create-store [update-store album-id on-loaded]
-  {:state {:tags          nil
-           :attached-tags nil}
-   :load-tags
-   (fn []
-     (datum.tag.api/tags (fn [tags]
-      (update-store #(assoc-in % [:state :tags] tags))))
+(defrecord State [tags attached-tags])
 
-     (datum.album.api/tags album-id (fn [tags]
-      (update-store #(assoc-in % [:state :attached-tags] tags)))))
+(defrecord Context [state update-context album-id on-loaded])
 
-   :on-load-tags on-loaded
-   })
+(defn update-state [context f]
+  (let [update-context (:update-context context)]
+    (update-context #(update % :state f))))
+
+(defn run [context]
+  (datum.tag.api/tags
+   (fn [tags]
+     (update-state context #(assoc % :tags tags))))
+  (datum.album.api/tags (:album-id context)
+   (fn [tags]
+     (update-state context #(assoc % :attached-tags tags)))))
+
+(defn on-loaded [context]
+  ((:on-loaded context) (:state context)))

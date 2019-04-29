@@ -7,7 +7,7 @@
 (defprotocol Transaction
   (update-context [this f]))
 
-(defrecord State [type covers])
+(defrecord State [status covers])
 
 (defrecord Context [state transaction api])
 
@@ -27,9 +27,9 @@
   (update-state context #(State. :loading []))
   (covers (-> context :api)
    (fn [covers]
-     (update-state context #(assoc % :type :appending))
+     (update-state context #(assoc % :status :appending))
      (call-partitioned covers
       (fn [sub]
         (update-state context #(update % :covers concat sub)))
       (fn []
-        (update-state context #(assoc % :type :finished)))))))
+        (update-state context #(assoc % :status :finished)))))))
