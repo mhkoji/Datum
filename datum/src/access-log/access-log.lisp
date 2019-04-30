@@ -8,7 +8,7 @@
            :resource-id
 
            :add-record
-           :load-resources-sort-by-access-count)
+           :get-resources-and-counts)
   (:import-from :datum.access-log.db
                 :resource-type
                 :resource-id))
@@ -25,13 +25,21 @@
 
 (defun add-record (container resource)
   (let ((db (container-db container))
-        (timestamp (timestamp)))
-    (datum.access-log.db:insert db resource timestamp)))
+        (accessed-at (timestamp)))
+    (datum.access-log.db:insert db resource accessed-at)))
 
-(defun load-resources-sort-by-access-count (container resource-type)
-  (let ((resource-ids (datum.access-log.db:select-ids-sort-by-access-count
-                       (container-db container)
-                       resource-type)))
-    (load-resources-by-ids (container-resource-loader container)
-                           resource-type
-                           resource-ids)))
+(defun get-resources-and-counts (container resource-type)
+  (let ((access-counts (datum.access-log.db:count-accesses
+                        (container-db container)
+                        resource-type)))
+    (let ((resources
+           (load-resources-by-ids
+            (container-resource-loader container)
+            resource-type
+            (mapcar #'datum.access-log.db:access-count-resource-id
+                    access-counts))))
+      (mapcar (lambda (resource access-count)
+                (cons resource
+                      (datum.access-log.db:access-count-count
+                       access-count)))
+              resources access-counts))))

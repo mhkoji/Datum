@@ -63,3 +63,12 @@
                                     type
                                     content-ids)
   (datum.tag:load-contents (gethash type loader) type content-ids))
+
+
+(defmethod datum.access-log:container-db ((c container))
+  (container-db c))
+
+(defmethod datum.access-log:container-resource-loader ((c container))
+  (make-instance 'datum.album:loader
+                 :db (container-db c)
+                 :thumbnail-repository (make-image-repository c)))

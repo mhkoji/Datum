@@ -3,11 +3,17 @@
   (:export :resource-type
            :resource-id
            :insert
-           :select-ids-sort-by-access-count))
+           :make-access-count
+           :access-count-resource-id
+           :access-count-count
+           :count-accesses))
 (in-package :datum.access-log.db)
 
 (defgeneric resource-type (resource))
 (defgeneric resource-id (resource))
 
-(defgeneric insert (db resource timestamp))
-(defgeneric select-ids-sort-by-access-count (db resource-type))
+
+(defstruct access-count resource-id count)
+
+(defgeneric insert (db resource accessed-at))
+(defgeneric count-accesses (db resource-type))

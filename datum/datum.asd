@@ -35,6 +35,12 @@
     ((:file "retrieve")
      (:file "thumbnail")))
 
+   (:module :access-log
+    :pathname "access-log"
+    :components
+    ((:file "db/db")
+     (:file "access-log")))
+
    (:file "album/thumbnail/entities")
    (:file "album/pictures/entities")
    (:file "album/pictures/db/mito")
@@ -43,6 +49,9 @@
    (:file "image/db/mito")
 
    (:file "tag/db/mito")
+
+   (:file "access-log/resources")
+   (:file "access-log/db/mito")
 
    (:module :db
     :pathname "db"
