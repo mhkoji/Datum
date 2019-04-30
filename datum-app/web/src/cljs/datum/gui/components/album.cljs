@@ -20,9 +20,8 @@
        "Open"]
       [:div
        [:p [tag/button
-            (if on-click-tag-button
-              {:on-click #(on-click-tag-button album-id)}
-              {:disabled true})]]]]]))
+            {:on-click (when on-click-tag-button
+                         #(on-click-tag-button album-id))}]]]]]))
 
 (defn covers-component [covers on-click-tag-button]
   [cards/card-decks
