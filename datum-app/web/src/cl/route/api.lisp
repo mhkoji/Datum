@@ -7,9 +7,7 @@
   (:use :cl
         :datum.app.web.route
         :datum.container)
-  (:export :bind-album
-           :bind-image
-           :bind-tag))
+  (:export :bind-all))
 (in-package :datum.app.web.route.api)
 
 (defun bind-album (app conf)
@@ -58,3 +56,12 @@
     ((:param :id))
     (lambda (tag-id)
       (datum.app.cli.tag:album-covers conf tag-id))))
+
+(defun bind-all (app conf)
+  (bind-route! app "/api/frequently-accessed/album/covers"
+    ()
+    (lambda ()
+      (datum.app.cli.frequently-accessed:album-covers conf)))
+  (bind-album app conf)
+  (bind-image app conf)
+  (bind-tag app conf))

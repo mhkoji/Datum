@@ -1,6 +1,7 @@
 (ns datum.gui.pages.main
   (:require [bidi.bidi :refer [match-route]]
             [goog.dom :as gdom]
+            [datum.gui.pages.frequently-accessed]
             [datum.gui.pages.album]
             [datum.gui.pages.album.view]
             [datum.gui.pages.albums]
@@ -9,7 +10,10 @@
 
 (def *routes*
   ["/"
-   {["album/" :album-id]
+   {["frequently-accessed"]
+    datum.gui.pages.frequently-accessed/render-loop
+
+    ["album/" :album-id]
     datum.gui.pages.album/render-loop
 
     ["album/" :album-id "/view"]

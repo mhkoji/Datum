@@ -25,6 +25,7 @@
   (defun overview (conf album-id)
     (with-container (container conf)
       (let ((album (load-album-by-id container album-id)))
+        (datum.access-log:add-record container album)
         (datum.album:album-overview album container))))
 
   (defun tags (conf album-id)
