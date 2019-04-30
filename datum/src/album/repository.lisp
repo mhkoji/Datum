@@ -61,6 +61,9 @@
             ids)))
 
 
-(defun delete-albums (db album-ids)
+(defun delete-albums (db album-ids thumbnail-repository)
+  (let ((thumbnail-ids (mapcar #'album-thumbnail-row-thumbnail-id
+                               (select-album-thumbnail-rows db album-ids))))
+    (datum.album.thumbnail:delete-by-ids thumbnail-repository thumbnail-ids))
   (delete-album-rows db album-ids)
   (delete-album-thumbnail-rows db album-ids))

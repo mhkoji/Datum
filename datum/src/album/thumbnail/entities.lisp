@@ -5,3 +5,6 @@
 
 (defmethod load-by-ids ((repos datum.image:repository) (thumbnail-ids list))
   (datum.image:load-images-by-ids repos thumbnail-ids))
+
+(defmethod delete-by-ids ((repos datum.image:repository) (thumbnail-ids list))
+  (datum.image:delete-images repos thumbnail-ids))

@@ -20,15 +20,18 @@
     (with-open-file (in path) (read in))))
 
 
-(defstruct container db)
+(defclass container (datum.album:container
+                     datum.image:container)
+  ((db :initarg :db
+       :accessor container-db)))
 
 (defmacro with-container ((container conf) &body body)
   `(datum.db:with-db (db (configure-db-factory ,conf))
-     (let ((,container (make-container :db db)))
+     (let ((,container (make-instance 'container :db db)))
        ,@body)))
 
 (defun make-image-repository (c)
-  (datum.image:make-repository :db (container-db c)))
+  (make-instance 'datum.image:repository :db (container-db c)))
 
 
 (defmethod datum.image:container-db ((c container))
@@ -49,12 +52,12 @@
   (container-db c))
 
 (defmethod datum.tag:container-content-loader ((c container))
-  c)
-
-(defmethod datum.tag:load-contents ((loader container)
-                                    (type (eql :album))
-                                    (content-ids list))
-  (datum.album:load-albums-by-ids loader content-ids))
+  (alexandria:alist-hash-table
+   (list (cons :album (make-instance 'datum.album:loader
+                                     :db (container-db c)
+                                     :thumbnail-repository
+                                     (make-image-repository c)))
+         (cons :image (make-image-repository c)))))
 
 (defmethod datum.tag:load-contents ((loader hash-table)
                                     type

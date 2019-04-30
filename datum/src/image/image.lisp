@@ -1,24 +1,46 @@
 (defpackage :datum.image
   (:use :cl)
-  (:export :container-db
+  (:export :repository
+           :container
+           :container-db
+           :load-images-by-ids
+           :delete-images
+           :create-images
+           :save-images
 
            :image
            :image-id
-           :image-path
-
-           :repository
-           :make-repository
-           :create-images
-           :save-images
-           :load-images-by-ids
-           :delete-images)
+           :image-path)
   (:import-from :datum.image.db
                 :image
                 :image-id
                 :image-path))
 (in-package :datum.image)
 
+(defclass repository ()
+  ((db
+    :initarg :db
+    :reader repository-db)))
+
+(defun load-images-by-ids (repos image-ids)
+  (datum.image.db:select-images (repository-db repos) image-ids))
+
+(defun delete-images (repos image-ids)
+  (datum.image.db:delete-images (repository-db repos) image-ids)
+  (values))
+
+(defun save-images (repos images)
+  (datum.image.db:insert-images (repository-db repos) images)
+  (values))
+
+
+(defclass container () ())
+
 (defgeneric container-db (c))
+
+(defmethod repository-db ((c container))
+  (container-db c))
+
 
 (defun create-images (id-generator paths)
   (let ((image-ids (mapcar (lambda (path)
@@ -27,19 +49,3 @@
     (mapcar (lambda (id path)
               (datum.image.db:make-image :id id :path path))
             image-ids paths)))
-
-(defstruct repository db)
-
-(defmethod container-db ((c repository))
-  (repository-db c))
-
-(defun save-images (container images)
-  (datum.image.db:insert-images (container-db container) images)
-  (values))
-
-(defun load-images-by-ids (container image-ids)
-  (datum.image.db:select-images (container-db container) image-ids))
-
-(defun delete-images (container image-ids)
-  (datum.image.db:delete-images (container-db container) image-ids)
-  (values))

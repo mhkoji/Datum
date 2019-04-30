@@ -1,12 +1,14 @@
 (defpackage :datum.album
   (:use :cl)
-  (:export :container-db
-           :container-thumbnail-repository
-           :container-entity-repository
-
-           :save-albums
+  (:export :loader
            :load-albums-by-ids
            :load-albums-by-range
+
+           :container
+           :container-db
+           :container-thumbnail-repository
+           :container-entity-repository
+           :save-albums
            :delete-albums
 
            :album
@@ -40,31 +42,48 @@
                 :album-thumbnail))
 (in-package :datum.album)
 
+(defclass loader ()
+  ((db
+    :initarg :db
+    :reader loader-db)
+   (thumbnail-repository
+    :initarg :thumbnail-repository
+    :reader loader-thumbnail-repository)))
+
+(defun load-albums-by-ids (loader ids)
+  (datum.album.repository:load-albums
+   (loader-db loader)
+   ids
+   (loader-thumbnail-repository loader)))
+
+(defun load-albums-by-range (loader offset count)
+  (let ((ids (datum.album.db:select-album-ids (loader-db loader)
+                                              offset
+                                              count)))
+    (load-albums-by-ids loader ids)))
+
+
+(defclass container () ())
 (defgeneric container-db (c))
 (defgeneric container-thumbnail-repository (c))
 (defgeneric container-entity-repository (c))
 
-;;; Album CRUD
+(defmethod loader-db ((c container))
+  (container-db c))
+
+(defmethod loader-thumbnail-repository ((c container))
+  (container-thumbnail-repository c))
+
 (defun save-albums (container albums)
   (datum.album.repository:save-albums (container-db container) albums))
 
-(defun load-albums-by-ids (container ids)
-  (datum.album.repository:load-albums
-   (container-db container)
-   ids
-   (container-thumbnail-repository container)))
-
-(defun load-albums-by-range (container offset count)
-  (let ((ids (datum.album.db:select-album-ids (container-db container)
-                                              offset
-                                              count)))
-    (load-albums-by-ids container ids)))
 
 (defun delete-albums (container album-ids)
   (let ((db (container-db container))
-        (entity-repos (container-entity-repository container)))
+        (entity-repos (container-entity-repository container))
+        (thumbnail-repos (container-thumbnail-repository container)))
     (datum.album.pictures:delete-by-album-ids db entity-repos album-ids)
-    (datum.album.repository:delete-albums db album-ids)))
+    (datum.album.repository:delete-albums db album-ids thumbnail-repos)))
 
 
 
