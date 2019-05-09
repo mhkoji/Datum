@@ -8,7 +8,7 @@
          :reader args)))
 
 (defmethod connect ((factory mito-factory))
-  (apply #'mito:connect-toplevel (args factory)))
+  (apply #'dbi:connect (args factory)))
 
 (defmethod initialize ((db dbi.driver:<dbi-connection>))
   (dolist (sym (list 'datum.album.db.mito:album
@@ -25,4 +25,5 @@
 
 (defmethod execute-in-transaction ((db dbi.driver:<dbi-connection>) callback)
   (dbi:with-transaction db
-    (funcall callback db)))
+    (let ((mito:*connection* db))
+      (funcall callback db))))
