@@ -1,10 +1,10 @@
 (defpackage :datum.web.route.asset
   (:use :cl)
-  (:export :bind-html
-           :bind-resources))
+  (:export :route-html
+           :route-resources))
 (in-package :datum.web.route.asset)
 
-(defun bind-html (app)
+(defun route-html (app)
   (setf (ningle:route app "/.*" :method :get :regexp t)
         (lambda (params)
           (declare (ignore params))
@@ -12,7 +12,7 @@
   app)
 
 
-(defun bind-resources (app root)
+(defun route-resources (app root)
   (setf (ningle:route app "/resources/*.*" :method :get)
         (lambda (params)
           (destructuring-bind (path type) (cdr (assoc :splat params))

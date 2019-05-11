@@ -13,10 +13,10 @@
   (when *handler*
     (clack:stop *handler*))
   (let ((app (make-instance 'ningle:<app>)))
-    (datum.web.route.api:bind-all app conf)
-    (datum.web.route.asset:bind-resources
+    (datum.web.route.api:route-api app conf)
+    (datum.web.route.asset:route-resources
      app (namestring *default-pathname-defaults*))
-    (datum.web.route.asset:bind-html app)
+    (datum.web.route.asset:route-html app)
     (setq *handler* (clack:clackup app
                                    :use-thread use-thread
                                    :port port))))

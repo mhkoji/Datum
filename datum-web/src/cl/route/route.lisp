@@ -2,7 +2,7 @@
   (:use :cl)
   (:export :as-json
            :as-file
-           :bind-route!))
+           :route))
 (in-package :datum.web.route)
 
 (defun as-json (obj &optional (success t))
@@ -21,20 +21,23 @@
 (defun param (params key)
   (cdr (assoc key params)))
 
-(defmacro bind-route! (app path args callback
-                       &key (method :get) (out '#'as-json))
+(defmacro route (app path &key (method :get)
+                               args
+                               perform
+                               (output '#'as-json))
   `(setf (ningle:route ,app ,path :method ,method)
          (lambda (params)
            (declare (ignorable params))
            (handler-case
-               (funcall ,out
-                        (,callback
-                         ,@(mapcar (lambda (arg)
-                                     (destructuring-bind (type key) arg
-                                       (ecase type
-                                         (:query `(query params ,key))
-                                         (:param `(param params ',key)))))
-                                   args)))
+               (funcall ,output
+                        (let ,(mapcar
+                               (lambda (arg)
+                                 (destructuring-bind (var (type key)) arg
+                                   (ecase type
+                                     (:query `(,var (query params ,key)))
+                                     (:param `(,var (param params ',key))))))
+                               args)
+                          ,perform))
              (error (c)
                (declare (ignore c))
                (as-json nil nil))))))
