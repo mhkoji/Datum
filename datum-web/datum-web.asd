@@ -1,4 +1,4 @@
-(asdf:defsystem :datum-app-web
+(asdf:defsystem :datum-web
   :serial t
   :pathname "src/cl"
   :components
@@ -13,7 +13,7 @@
      (:file "asset")))
 
    (:file "web"))
-  :depends-on (:datum-app-cli
+  :depends-on (:datum
 
                :cl-who
                :cl-arrows

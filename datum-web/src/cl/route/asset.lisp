@@ -1,14 +1,14 @@
-(defpackage :datum.app.web.route.asset
+(defpackage :datum.web.route.asset
   (:use :cl)
   (:export :bind-html
            :bind-resources))
-(in-package :datum.app.web.route.asset)
+(in-package :datum.web.route.asset)
 
 (defun bind-html (app)
   (setf (ningle:route app "/.*" :method :get :regexp t)
         (lambda (params)
           (declare (ignore params))
-          (datum.app.web.html:main "/resources/compiled/cljs/bundle.js")))
+          (datum.web.html:main "/resources/compiled/cljs/bundle.js")))
   app)
 
 

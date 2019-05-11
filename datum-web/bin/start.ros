@@ -25,7 +25,6 @@ exec ros -Q -- $0 "$@"
       (let ((conf (datum.container:load-configure conf-path)))
         (setq start-args (list* :conf conf
                                 start-args))))
-    (apply #'datum.app.web:start start-args)
-    (loop (sleep 1))))
+    (apply #'datum.app.web:start start-args)))
 
 ;;; vim: set ft=lisp lisp:

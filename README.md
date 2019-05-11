@@ -1,7 +1,7 @@
 # Datum
 Data repository written in Common Lisp
 
-## datum-app-web
+## datum-web
 
 Web application for Datum.
 
@@ -23,7 +23,7 @@ $ make
 $ cd datum-app/web
 $ mkdir -p ./target/thumbnails
 $ sbcl
-CL-USER> (ql:quickload '(:datum-app-cli :datum-app-web))
+CL-USER> (ql:quickload :datum-web))
 CL-USER> (defvar *conf*
            (datum.container:make-configure
             :id-generator
@@ -32,13 +32,12 @@ CL-USER> (defvar *conf*
             (make-instance 'datum.db.mito:mito-factory
                            :args (list :sqlite3
                                        :database-name
-                                       "./target/db.sqlite3.bin"))
+                                       "./target/db.sqlite3"))
             :thumbnail-root
             (merge-pathnames "./target/thumbnails/")))
-CL-USER> (datum.app.cli:initialize :conf *conf*)
-CL-USER> (datum.app.cli.album:add-albums "./resources/contents/"
-                                          :conf *conf*)
-CL-USER> (datum.app.web:start :conf *conf*)
+CL-USER> (datum.app:initialize :conf *conf*)
+CL-USER> (datum.app.album:add-albums "./resources/contents/" :conf *conf*)
+CL-USER> (datum.web:start :conf *conf*)
 ```
 
 Visit http://localhost:18888/albums

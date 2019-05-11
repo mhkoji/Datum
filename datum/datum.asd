@@ -59,7 +59,17 @@
     ((:file "db")
      (:file "mito")))
 
-   (:file "container"))
+   (:file "container")
+
+   (:module :app
+    :pathname "app"
+    :components
+    ((:file "app")
+     (:file "album/album")
+     (:file "album/add-albums")
+     (:file "image")
+     (:file "tag")
+     (:file "frequently-accessed"))))
 
   :depends-on (:babel
                :ironclad

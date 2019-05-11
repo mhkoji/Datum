@@ -1,7 +1,7 @@
-(defpackage :datum.app.web.html
+(defpackage :datum.web.html
   (:use :cl)
   (:export :main))
-(in-package :datum.app.web.html)
+(in-package :datum.web.html)
 
 (defun main (js-src)
   (cl-who:with-html-output-to-string (s nil :prologue t)

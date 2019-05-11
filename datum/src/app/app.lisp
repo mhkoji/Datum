@@ -1,10 +1,10 @@
-(defpackage :datum.app.cli
+(defpackage :datum.app
   (:use :cl)
   (:export :initialize)
   (:import-from :datum.container
                 :load-configure
                 :with-container))
-(in-package :datum.app.cli)
+(in-package :datum.app)
 
 (defun initialize (&key (conf (load-configure)))
   (with-container (c conf)

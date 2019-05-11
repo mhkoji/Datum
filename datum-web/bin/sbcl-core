@@ -1,0 +1,3 @@
+#!/bin/bash
+
+ros run -s datum-web -e "(sb-ext:save-lisp-and-die \"datum.core\")"

@@ -1,9 +1,9 @@
-(defpackage :datum.app.cli.album.add-albums
+(defpackage :datum.app.album.add-albums
   (:use :cl
         :datum.album
         :datum.stream
         :datum.fs.retrieve)
-  (:import-from :datum.app.cli.album
+  (:import-from :datum.app.album
                 :add-albums)
   (:import-from :datum.container
                 :load-configure
@@ -15,7 +15,7 @@
                 :create-images)
   (:import-from :alexandria
                 :when-let))
-(in-package :datum.app.cli.album.add-albums)
+(in-package :datum.app.album.add-albums)
 
 (defun get-thumbnail-file-fn (conf)
   (labels ((make-thumbnail-path (source-path)

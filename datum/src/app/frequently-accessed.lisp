@@ -1,10 +1,10 @@
-(defpackage :datum.app.cli.frequently-accessed
+(defpackage :datum.app.frequently-accessed
   (:use :cl)
   (:export :album-covers)
   (:import-from :datum.container
                 :load-configure
                 :with-container))
-(in-package :datum.app.cli.frequently-accessed)
+(in-package :datum.app.frequently-accessed)
 
 (defun album-covers (conf)
   (with-container (container conf)

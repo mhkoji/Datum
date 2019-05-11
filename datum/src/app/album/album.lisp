@@ -1,4 +1,4 @@
-(defpackage :datum.app.cli.album
+(defpackage :datum.app.album
   (:use :cl)
   (:export :add-albums
            :covers
@@ -8,7 +8,7 @@
   (:import-from :datum.container
                 :load-configure
                 :with-container))
-(in-package :datum.app.cli.album)
+(in-package :datum.app.album)
 
 (defun covers (conf offset count)
   (with-container (container conf)

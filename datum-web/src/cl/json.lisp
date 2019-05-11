@@ -1,7 +1,7 @@
-(defpackage :datum.app.web.json
+(defpackage :datum.web.json
   (:use :cl)
   (:export :make-result))
-(in-package :datum.app.web.json)
+(in-package :datum.web.json)
 
 (defgeneric as-jsown (obj))
 
