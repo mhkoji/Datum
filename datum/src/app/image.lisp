@@ -1,7 +1,7 @@
 (defpackage :datum.app.image
   (:use :cl)
   (:export :path)
-  (:import-from :datum.container
+  (:import-from :datum.app
                 :with-container))
 (in-package :datum.app.image)
 

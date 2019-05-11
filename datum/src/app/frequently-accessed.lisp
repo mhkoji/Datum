@@ -1,8 +1,7 @@
 (defpackage :datum.app.frequently-accessed
   (:use :cl)
   (:export :album-covers)
-  (:import-from :datum.container
-                :load-configure
+  (:import-from :datum.app
                 :with-container))
 (in-package :datum.app.frequently-accessed)
 

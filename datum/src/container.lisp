@@ -1,34 +1,15 @@
 (defpackage :datum.container
   (:use :cl)
-  (:export :make-configure
-           :load-configure
-           :configure-thumbnail-root
-           :configure-id-generator
-           :with-container
-           :container-db))
+  (:export :container :initialize))
 (in-package :datum.container)
-
-(defstruct configure
-  id-generator
-  db-factory
-  thumbnail-root)
-
-(defun load-configure (&optional (path (merge-pathnames
-                                        ".datum.config.lisp"
-                                        (user-homedir-pathname))))
-  (when (cl-fad:file-exists-p path)
-    (with-open-file (in path) (read in))))
-
 
 (defclass container (datum.album:container
                      datum.image:container)
   ((db :initarg :db
        :accessor container-db)))
 
-(defmacro with-container ((container conf) &body body)
-  `(datum.db:with-db (db (configure-db-factory ,conf))
-     (let ((,container (make-instance 'container :db db)))
-       ,@body)))
+(defun initialize (container)
+  (datum.db:initialize (container-db container)))
 
 (defun make-image-repository (c)
   (make-instance 'datum.image:repository :db (container-db c)))

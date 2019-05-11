@@ -4,7 +4,7 @@
            :add-tag
            :delete-tag
            :album-covers)
-  (:import-from :datum.container
+  (:import-from :datum.app
                 :with-container))
 (in-package :datum.app.tag)
 

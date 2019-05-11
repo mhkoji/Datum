@@ -5,8 +5,7 @@
            :overview
            :tags
            :set-tags)
-  (:import-from :datum.container
-                :load-configure
+  (:import-from :datum.app
                 :with-container))
 (in-package :datum.app.album)
 

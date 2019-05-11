@@ -5,8 +5,7 @@
         :datum.fs.retrieve)
   (:import-from :datum.app.album
                 :add-albums)
-  (:import-from :datum.container
-                :load-configure
+  (:import-from :datum.app
                 :configure-id-generator
                 :configure-thumbnail-root
                 :with-container)
@@ -38,7 +37,7 @@
                                                source-path)))
     (car (create-images id-generator (list thumbnail-path)))))
 
-(defun add-albums (root-dir &key (conf (load-configure))
+(defun add-albums (root-dir &key (conf (datum.app:load-configure))
                                  (sort-paths-fn #'identity))
   (let ((dirs (stream-to-list (retrieve root-dir sort-paths-fn)))
         (id-generator (configure-id-generator conf))
