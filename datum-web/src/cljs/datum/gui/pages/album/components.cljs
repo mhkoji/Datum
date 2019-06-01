@@ -10,11 +10,10 @@
             [datum.gui.url :as url]))
 
 (defn image-component [{:keys [image album-id]}]
-  [:div {:class "col-md-4"}
-   [:div {:class "card mb-4 box-shadow"}
-    [:a {:href (url/album-viewer-single album-id image)}
-     [:img {:class "card-img-top"
-            :src (url/image image)}]]]])
+  [:div {:class "card mb-4 box-shadow" :style {:maxWidth "18rem"}}
+   [:a {:href (url/album-viewer-single album-id image)}
+    [:img {:class "card-img-top"
+           :src (url/image image)}]]])
 
 (defn page [{:keys [header show-album-overview]}]
   (r/create-class
