@@ -6,7 +6,17 @@
    (let [{:keys [name url]} brand]
      [:a {:class "navbar-brand" :href url} name])
 
-   [:div {:class "collapse navbar-collapse"}
+   [:button {:class "navbar-toggler"
+             :type "button"
+             :data-toggle "collapse"
+             :data-target "#header-reagent-header-component-alt-markup"
+             :aria-controls "navbarNavDropdown"
+             :aria-expanded "false"
+             :aria-label "Toggle navigation"}
+    [:span {:class "navbar-toggler-icon"}]]
+
+   [:div {:class "collapse navbar-collapse"
+          :id "header-reagent-header-component-alt-markup"}
     [:ul {:class "navbar-nav mr-auto mt-2 mt-lg-0"}
      (for [page pages]
        (let [{:keys [id name url active-p]} page]
