@@ -7,21 +7,24 @@
 (defn cover-component [{:keys [cover on-click-tag-button]}]
   (let [album-id (-> cover :album-id)
         link     (url/album album-id)]
-    [:div {:class "card mb-4 box-shadow" :style {:maxWidth "18rem"}}
-     [:a {:href link}
+    [:div {:class "card mb-4 box-shadow"}
+     [:a {:href link :target "_blank"}
       [:img {:src (url/image (-> cover :thumbnail))
              :class "card-img-top"}]]
 
      [:div {:class "card-body"}
-      [:div {:class "card-title"} (-> cover :name)]
-      [:a {:href link
-           :class "btn btn-secondary btn-sm"
-           :type "button"}
-       "Open"]
-      [:div
-       [:p [tag/button
-            {:on-click (when on-click-tag-button
-                         #(on-click-tag-button album-id))}]]]]]))
+      [:div {:class "card-title"}
+       [:div {:style {:overflow "hidden"
+                      :whiteSpace "nowrap"
+                      :textOverflow "ellipsis"}
+              :title (-> cover :name)}
+        (-> cover :name)]]
+      [:div {:class "btn-toolbar" :role "toolbar"}
+       [:div
+        [tag/button
+         {:on-click
+          (when on-click-tag-button
+            #(on-click-tag-button album-id))}]]]]]))
 
 (defn covers-component [covers on-click-tag-button]
   [cards/card-decks

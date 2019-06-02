@@ -14,11 +14,11 @@
 
 (defn button [{:keys [on-click]}]
   [:button (merge {:type "button"
-                   :class "btn btn-outline-secondary"}
+                   :class "btn btn-outline-secondary btn-sm"}
                   (if on-click
                     {:on-click on-click}
                     {:disabled true}))
-   "Tags"])
+   [:span {:class "oi oi-tags" :title "Tags"}]])
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
