@@ -42,6 +42,14 @@
             (sxql:order-by (:desc :updated_at))
             (sxql:limit offset count))))
 
+(defmethod select-album-ids-by-like ((db <dbi-connection>)
+                                     (name string))
+  (mapcar #'album-id
+          (mito:select-dao 'album
+            (sxql:where (:like :name (format nil "%~A%" name)))
+            (sxql:order-by (:desc :updated_at))
+            (sxql:limit 50))))
+
 
 (defmethod delete-album-rows ((db <dbi-connection>) (album-ids list))
   (dolist (album-id album-ids)

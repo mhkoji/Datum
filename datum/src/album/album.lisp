@@ -3,6 +3,7 @@
   (:export :loader
            :load-albums-by-ids
            :load-albums-by-range
+           :search-albums
 
            :container
            :container-db
@@ -60,6 +61,12 @@
   (let ((ids (datum.album.db:select-album-ids (loader-db loader)
                                               offset
                                               count)))
+    (load-albums-by-ids loader ids)))
+
+(defun search-albums (loader name)
+  (let ((ids (datum.album.db:select-album-ids-by-like
+              (loader-db loader)
+              name)))
     (load-albums-by-ids loader ids)))
 
 

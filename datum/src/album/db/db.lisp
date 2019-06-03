@@ -4,6 +4,7 @@
            :insert-album-rows
            :select-album-rows
            :select-album-ids
+           :select-album-ids-by-like
            :delete-album-rows
            :album-row-id
            :album-row-name
@@ -25,6 +26,7 @@
 (defgeneric insert-album-rows (db rows))
 (defgeneric select-album-rows (db album-ids))
 (defgeneric select-album-ids (db offset count))
+(defgeneric select-album-ids-by-like (db name))
 (defgeneric delete-album-rows (db album-ids))
 
 

@@ -1,7 +1,9 @@
 (defpackage :datum.app.album
   (:use :cl)
+  (:shadow :search)
   (:export :add-albums
            :covers
+           :search
            :overview
            :tags
            :set-tags)
@@ -15,6 +17,12 @@
                    container
                    (or offset 0)
                    (or count 500))))
+      (mapcar #'datum.album:album-cover albums))))
+
+(defun search (conf keyword)
+  (with-container (container conf)
+    (let ((albums (datum.album:search-albums
+                   container keyword)))
       (mapcar #'datum.album:album-cover albums))))
 
 (labels ((load-album-by-id (container album-id)
