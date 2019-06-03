@@ -7,7 +7,7 @@
                  (map-indexed (fn [index item]
                                 (list (quot index num) item))
                               items))]
-      [:div {:class "container"}
+      [:div
        (for [row-index (sort < (keys group))]
          ^{:key (str row-index)}
          [:div {:class "card-deck"}

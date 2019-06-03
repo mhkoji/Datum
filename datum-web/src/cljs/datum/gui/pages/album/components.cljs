@@ -34,7 +34,7 @@
 
           (if-let [pictures (-> overview :pictures)]
             [:container
-             [:div
+             [:div {:class "container"}
               [edit-album-tags/modal edit-album-tags]
               [:p [tag/button {:on-click
                                #(edit-album-tags/start

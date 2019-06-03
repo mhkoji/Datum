@@ -14,6 +14,9 @@
   (route app "/api/album/covers"
    :args ((o (:query "offset")) (c (:query "count")))
    :perform (datum.app.album:covers conf o c))
+  (route app "/api/album/search"
+   :args ((keyword (:query "keyword")))
+   :perform (datum.app.album:search conf keyword))
   (route app "/api/album/:id/overview"
    :args ((id (:param :id)))
    :perform (datum.app.album:overview conf id))

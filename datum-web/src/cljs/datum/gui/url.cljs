@@ -7,6 +7,9 @@
   (str "/album/" album-id
        "/view?viewer=single&current=" (-> image :image-id)))
 
+(defn albums-search [keyword]
+  (str "/albums?keyword=" keyword))
+
 (defn albums
   ([]
    "/albums")

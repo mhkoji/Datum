@@ -21,6 +21,11 @@
     (go (let [xs (<! (api/req ajax.core/GET path opts))]
           (k (map obj->cover xs))))))
 
+(defn search [keyword k]
+  (let [path "/album/search"
+        opts {:params {"keyword" keyword}}]
+    (go (let [xs (<! (api/req ajax.core/GET path opts))]
+          (k (map obj->cover xs))))))
 
 (defn obj->overview [x]
   (datum.album/Overview. (x "album-id")

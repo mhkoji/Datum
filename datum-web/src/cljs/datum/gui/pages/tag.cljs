@@ -46,7 +46,8 @@
 
            (if (= type :loading)
              [:div "Loading..."]
-             [covers-component covers])])
+             [:div {:class "container"}
+              [covers-component covers]])])
         ]])
     }))
 
