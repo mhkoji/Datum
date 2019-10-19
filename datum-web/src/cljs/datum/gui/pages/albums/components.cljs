@@ -21,16 +21,24 @@
    [link prev ^{:key "prev"} [icon-prev]]
    [link next ^{:key "next"} [icon-next]]])
 
-(defn album-search-component [{:keys [keyword
-                                      on-change-keyword
-                                      on-search] :as self}]
-  [:input {:class "form-control"
-           :value keyword
-           :on-change #(on-change-keyword (.-value (.-target %)))
-           :on-key-down (fn [evt]
-                          (when (= (.-keyCode evt) 13)
-                            (on-search self)))}])
 
+(defn header-search-form [search-albums]
+  (let [{:keys [keyword
+                on-change-keyword
+                on-search]} search-albums]
+    (letfn [(on-change [evt]
+              (on-change-keyword (.-value (.-target evt))))
+            (on-key-down [evt]
+              (when (= (.-keyCode evt) 13)
+                (on-search search-albums)))]
+      [:form {:class "form-inline my-2 my-lg-0"}
+       [:input {:class "form-control mr-sm-2"
+                :type "search"
+                :placeholder "Search"
+                :aria-label "search"
+                :value keyword
+                :on-change on-change
+                :on-key-down on-key-down}]])))
 
 (defn page [{:keys [header pager
                     search-albums
@@ -48,7 +56,8 @@
                  edit-album-tags]}]
       [:div
        ;; header
-       [header-component header]
+       [header-component header
+        {:form [header-search-form search-albums]}]
 
        [:main {:class "pt-3 px-4"}
         [:h1 {:class "h2"} "Albums"]
@@ -60,8 +69,6 @@
            [:div {:class "container"}
             (when (instance? show-album-covers/Fetching state)
               [spinner])
-
-            [album-search-component search-albums]
 
             (when pager
               [pager-component pager])

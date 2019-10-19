@@ -1,6 +1,6 @@
 (ns datum.gui.components.header.reagent)
 
-(defn header-component [{:keys [brand pages]}]
+(defn header-component [{:keys [brand pages]} {:keys [form]}]
   [:nav {:class "navbar navbar-expand-lg navbar-dark bg-dark"}
 
    (let [{:keys [name url]} brand]
@@ -25,6 +25,8 @@
                            (if active-p " active" ""))}
           [:a {:class "nav-link" :href url} name]]))]
 
+    form
+
     [:ul {:class "navbar-nav flex-row ml-md-auto d-none d-md-flex"}
      [:li {:class "nav-item dropdown"}
       [:a {:class "nav-link dropdown-toggle"
@@ -39,4 +41,5 @@
             :aria-labelledby "datum-header-user-dropdown"}
        [:li {:class "dropdown-item"} [:a nil "Signed in as datum"]]
        [:li {:class "dropdown-divider"}]
-       [:li {:class "dropdown-item"} [:a {:href "#"} "Sign out"]]]]]]])
+       [:li {:class "dropdown-item"} [:a {:href "#"} "Sign out"]]]]]
+    ]])
