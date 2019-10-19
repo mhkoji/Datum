@@ -1,7 +1,5 @@
 (ns datum.gui.pages.albums.components
   (:require [reagent.core :as r]
-            [datum.gui.components.album :as album-components]
-            [datum.gui.components.loading :as loading-components]
             [datum.gui.components.header.reagent :refer [header-component]]
             [datum.gui.controllers.show-album-covers :as show-album-covers]
             [datum.gui.controllers.edit-album-tags :as edit-album-tags]))
@@ -21,6 +19,14 @@
   [:div {:class "btn-toolbar" :role "toolbar"}
    [link prev ^{:key "prev"} [icon-prev]]
    [link next ^{:key "next"} [icon-next]]])
+
+
+(defn spinner []
+  [:div {:class "d-flex justify-content-center"}
+   [:div {:class "spinner-border"
+          :style {:width "3rem" :height "3rem"}
+          :role "status"}
+    [:span {:class "sr-only"} "Loading..."]]])
 
 
 (defn album-search-component [{:keys [keyword
@@ -58,9 +64,9 @@
         ;; covers
         [:main {:class "pt-3 px-4"}
 
-         (let [{:keys [status covers]} (-> show-album-covers :state)]
-           (if (= status :loading)
-             "Loading..."
+         (let [{:keys [state]} show-album-covers]
+           (if (instance? show-album-covers/Fetching state)
+             [spinner]
              [:div {:class "container"}
 
               [album-search-component search-albums]
@@ -68,14 +74,8 @@
               (when pager
                 [pager-component pager])
 
-              (cond (= status :appending)
-                    [album-components/covers-component covers nil]
-
-                    (= status :finished)
-                    (if (empty? covers)
-                      "EMPTY!"
-                      [album-components/covers-component covers
-                       #(edit-album-tags/start edit-album-tags %)]))
+              [show-album-covers/component
+               state #(edit-album-tags/start edit-album-tags %)]
 
               (when pager
                 [pager-component pager])
