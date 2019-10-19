@@ -1,5 +1,6 @@
 (ns datum.gui.controllers.show-album-covers
   (:require [cljs.core.async :refer [go <! timeout]]
+            [datum.gui.components.loading :refer [spinner]]
             [datum.gui.components.album :as album-components]))
 
 (defprotocol Api
@@ -50,7 +51,9 @@
   nil)
 
 (defmethod component Fetching [state on-click-tag-button]
-  [album-components/placeholder-covers-component {:num 20}])
+  [:div
+   [spinner]
+   [album-components/placeholder-covers-component {:num 20}]])
 
 (defmethod component Appending [state on-click-tag-button]
   (let [{:keys [covers]} state]
@@ -59,5 +62,5 @@
 (defmethod component Loaded [state on-click-tag-button]
   (let [{:keys [covers]} state]
     (if (empty? covers)
-      "EMPTY!"
+      [:div "EMPTY!"]
       [album-components/covers-component covers on-click-tag-button])))
