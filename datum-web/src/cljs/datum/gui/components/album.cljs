@@ -26,6 +26,28 @@
           (when on-click-tag-button
             #(on-click-tag-button album-id))}]]]]]))
 
+(defn placeholder-cover-component [_]
+  (let [title "..."]
+    [:div {:class "card mb-4 box-shadow"}
+     [:svg {:class "bd-placeholder-img card-img-top"
+            :width "100%"
+            :height "180"
+            :preserveAspectRatio "xMidYMid slice"
+            :focusable :false
+            :role "img"}
+      ;[:rect {:width "100%" :height "100%" :fill "#868e96"}]
+      ]
+     [:div {:class "card-body"}
+      [:div {:class "card-title"}
+       [:div {:style {:overflow "hidden"
+                      :whiteSpace "nowrap"
+                      :textOverflow "ellipsis"}
+              :title title}
+        title]]
+      [:div {:class "btn-toolbar" :role "toolbar"}
+       [:div
+        [tag/button {:on-click nil}]]]]]))
+
 (defn covers-component [covers on-click-tag-button]
   [cards/card-decks
    (map (fn [cover]
@@ -34,3 +56,8 @@
            :on-click-tag-button on-click-tag-button})
         covers)
    :key 4 cover-component])
+
+(defn placeholder-covers-component [{:keys [num]}]
+  [cards/card-decks
+   (map (fn [i] {:key i}) (range num))
+   :key 4 placeholder-cover-component])

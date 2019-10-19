@@ -44,13 +44,17 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defmulti component (fn [state] (type state)))
+(defmulti component (fn [state _] (type state)))
 
 (defmethod component :default [state]
   nil)
 
+(defmethod component Fetching [state on-click-tag-button]
+  [album-components/placeholder-covers-component {:num 20}])
+
 (defmethod component Appending [state on-click-tag-button]
-  [album-components/covers-component (:covers state) on-click-tag-button])
+  (let [{:keys [covers]} state]
+    [album-components/covers-component covers on-click-tag-button]))
 
 (defmethod component Loaded [state on-click-tag-button]
   (let [{:keys [covers]} state]

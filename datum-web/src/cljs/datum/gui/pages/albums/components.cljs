@@ -57,21 +57,21 @@
         [:main {:class "pt-3 px-4"}
 
          (let [{:keys [state]} show-album-covers]
-           (if (instance? show-album-covers/Fetching state)
-             [spinner]
-             [:div {:class "container"}
+           [:div {:class "container"}
+            (when (instance? show-album-covers/Fetching state)
+              [spinner])
 
-              [album-search-component search-albums]
+            [album-search-component search-albums]
 
-              (when pager
-                [pager-component pager])
+            (when pager
+              [pager-component pager])
 
-              [show-album-covers/component
-               state #(edit-album-tags/start edit-album-tags %)]
+            [show-album-covers/component
+             state #(edit-album-tags/start edit-album-tags %)]
 
-              (when pager
-                [pager-component pager])
-              ]))]]
+            (when pager
+              [pager-component pager])
+            ])]]
 
        [edit-album-tags/modal edit-album-tags]])
     }))
