@@ -26,20 +26,4 @@
           [:a {:class "nav-link" :href url} name]]))]
 
     form
-
-    [:ul {:class "navbar-nav flex-row ml-md-auto d-none d-md-flex"}
-     [:li {:class "nav-item dropdown"}
-      [:a {:class "nav-link dropdown-toggle"
-           :href "#"
-           :id "datum-header-user-dropdown"
-           :role "button"
-           :data-toggle "dropdown"
-           :aria-haspopup "true"
-           :aria-expanded "false"}
-       [:span {:class "oi oi-person" :aria-hidden "true"}]]
-      [:ul {:class "dropdown-menu dropdown-menu-right"
-            :aria-labelledby "datum-header-user-dropdown"}
-       [:li {:class "dropdown-item"} [:a nil "Signed in as datum"]]
-       [:li {:class "dropdown-divider"}]
-       [:li {:class "dropdown-item"} [:a {:href "#"} "Sign out"]]]]]
     ]])
