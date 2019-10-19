@@ -9,6 +9,13 @@
 (defprotocol Transaction
   (update-context [this f]))
 
+(defn get-context [tran context-getter]
+  (letfn [(consume-without-modification [context]
+            (context-getter context)
+            context)]
+    (update-context tran consume-without-modification)))
+
+
 (defrecord ClosedContext [transaction])
 
 (defn saving-context [tran album-id attached-tags]
@@ -40,15 +47,15 @@
   (loading/Context.
    nil
 
+   #(get-context tran %)
+
    #(update-context tran %)
 
    album-id
 
-   (fn [loading-state]
+   (fn [tags attached-tags]
      (update-context tran #(editing-context
-                            tran album-id
-                            (-> loading-state :tags)
-                            (-> loading-state :attached-tags))))))
+                            tran album-id tags attached-tags)))))
 
 
 (defn start [context album-id]

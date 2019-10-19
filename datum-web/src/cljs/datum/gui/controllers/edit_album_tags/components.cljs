@@ -1,6 +1,7 @@
 (ns datum.gui.controllers.edit-album-tags.components
   (:require [reagent.core :as r]
             [cljsjs.react-modal]
+            [datum.gui.components.loading :refer [spinner]]
             [datum.gui.controllers.edit-album-tags.loading :as loading]
             [datum.gui.controllers.edit-album-tags.editing :as editing]
             [datum.gui.controllers.edit-album-tags.saving :as saving]))
@@ -28,16 +29,9 @@
     (fn [_]
       (loading/run loading-context))
 
-    :component-did-update
-    (fn [comp]
-      (let [loading-context (r/props comp)]
-        (let [{:keys [tags attached-tags]} (-> loading-context :state)]
-          (when (and tags attached-tags)
-            (loading/on-loaded loading-context)))))
-
     :reagent-render
     (fn []
-      [:div "Loading..."])}))
+      [spinner])}))
 
 (defn loading-modal [loading-context]
   (r/create-element
@@ -47,8 +41,7 @@
         :contentLabel "Tags"}
    (r/as-element
     [:div
-     [loading-component loading-context]
-     [modal-footer {}]])))
+     [loading-component loading-context]])))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

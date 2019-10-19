@@ -1,5 +1,6 @@
 (ns datum.gui.pages.albums.components
   (:require [reagent.core :as r]
+            [datum.gui.components.loading :refer [spinner]]
             [datum.gui.components.header.reagent :refer [header-component]]
             [datum.gui.controllers.show-album-covers :as show-album-covers]
             [datum.gui.controllers.edit-album-tags :as edit-album-tags]))
@@ -19,15 +20,6 @@
   [:div {:class "btn-toolbar" :role "toolbar"}
    [link prev ^{:key "prev"} [icon-prev]]
    [link next ^{:key "next"} [icon-next]]])
-
-
-(defn spinner []
-  [:div {:class "d-flex justify-content-center"}
-   [:div {:class "spinner-border"
-          :style {:width "3rem" :height "3rem"}
-          :role "status"}
-    [:span {:class "sr-only"} "Loading..."]]])
-
 
 (defn album-search-component [{:keys [keyword
                                       on-change-keyword
