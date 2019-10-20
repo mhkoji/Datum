@@ -47,18 +47,17 @@
         ;; covers
         [:main {:class "pt-3 px-4"}
 
-         (let [{:keys [state]} show-album-covers]
-           [:div {:class "container"}
-            (when pager
-              [pager-component pager])
+         [:div {:class "container"}
+          (when pager
+            [pager-component pager])
 
-            [show-album-covers/component
-             state
-             #(edit-album-tags/start edit-album-tags %)]
+          [show-album-covers/component
+           show-album-covers
+           #(edit-album-tags/start edit-album-tags %)]
 
-            (when pager
-              [pager-component pager])
-            ])]]
+          (when pager
+            [pager-component pager])
+          ]]]
 
        [edit-album-tags/modal edit-album-tags]])
     }))

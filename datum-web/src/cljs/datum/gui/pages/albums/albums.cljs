@@ -11,7 +11,6 @@
             [datum.gui.url :as url]
             [datum.gui.pages.util :as util]))
 
-
 (defn create-truth [update! keyword]
   {:header
    (header/get-state :album)
@@ -23,11 +22,11 @@
         (update! #(update % :edit-album-tags f)))))
 
    :search-albums
-   (search-albums/Context.
-    (search-albums/State. keyword)
+   (show-album-covers/->Context
+    (search-albums/->State keyword)
 
     (fn [f]
-      (update! #(update % :search-albums f)))
+      (update! #(update-in % [:search-albums :state] f)))
 
     (fn [url]
       (set! (.-location js/window) url)))
@@ -41,12 +40,11 @@
     :next {:link (url/albums (+ offset count) count) :enabled true}}
 
    :show-album-covers
-   (show-album-covers/Context.
+   (show-album-covers/->Context
     nil
 
-    (reify show-album-covers/Transaction
-      (show-album-covers/update-context [_ f]
-        (update! #(update % :show-album-covers f))))
+    (fn [f]
+      (update! #(update-in % [:show-album-covers :state] f)))
 
     (reify show-album-covers/Api
       (show-album-covers/covers [_ k]
@@ -58,9 +56,8 @@
    (show-album-covers/Context.
     nil
 
-    (reify show-album-covers/Transaction
-      (show-album-covers/update-context [_ f]
-        (update! #(update % :show-album-covers f))))
+    (fn [f]
+      (update! #(update-in % [:show-album-covers :state] f)))
 
     (reify show-album-covers/Api
       (show-album-covers/covers [_ k]

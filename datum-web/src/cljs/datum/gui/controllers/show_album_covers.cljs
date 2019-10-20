@@ -6,21 +6,15 @@
 (defprotocol Api
   (covers [this k]))
 
-(defprotocol Transaction
-  (update-context [this f]))
-
-(defrecord Context [state transaction api])
-
-(defn update-state [context f]
-  (update-context (-> context :transaction) #(update % :state f)))
-
-
 ;; States
 (defrecord Fetching [])
 
 (defrecord Appending [covers])
 
 (defrecord Loaded [covers])
+
+
+(defrecord Context [state update-state api])
 
 
 (defn call-partitioned [xs on-processing on-finished]
@@ -32,35 +26,35 @@
               (recur rest))))))
 
 (defn run [context]
-  (update-state context #(Fetching.))
-  (covers (-> context :api)
+  ((:update-state context) #(->Fetching))
+  (covers (:api context)
    (fn [covers]
-     (update-state context #(Appending. []))
+     ((:update-state context) #(->Appending []))
      (call-partitioned covers
       (fn [sub]
-        (update-state context #(update % :covers concat sub)))
+        ((:update-state context) #(update % :covers concat sub)))
       (fn []
-        (update-state context #(Loaded. (:covers %))))))))
+        ((:update-state context) #(->Loaded (:covers %))))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defmulti component (fn [state _] (type state)))
+(defmulti component (fn [context _] (type (:state context))))
 
-(defmethod component :default [state]
+(defmethod component :default [context on-click-tag-button]
   nil)
 
-(defmethod component Fetching [state on-click-tag-button]
+(defmethod component Fetching [context on-click-tag-button]
   [:div
    [spinner]
    [album-components/placeholder-covers-component {:num 20}]])
 
-(defmethod component Appending [state on-click-tag-button]
-  (let [{:keys [covers]} state]
+(defmethod component Appending [context on-click-tag-button]
+  (let [{:keys [covers]} (:state context)]
     [album-components/covers-component covers on-click-tag-button]))
 
-(defmethod component Loaded [state on-click-tag-button]
-  (let [{:keys [covers]} state]
+(defmethod component Loaded [context on-click-tag-button]
+  (let [{:keys [covers]} (:state context)]
     (if (empty? covers)
       [:div "EMPTY!"]
       [album-components/covers-component covers on-click-tag-button])))

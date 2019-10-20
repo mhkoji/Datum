@@ -75,9 +75,8 @@
    (show-album-covers/Context.
     nil
 
-    (reify show-album-covers/Transaction
-      (show-album-covers/update-context [_ f]
-        (update-store #(update % :show-album-covers f))))
+    (fn [f]
+      (update-store #(update-in % [:show-album-covers :state] f)))
 
     (reify show-album-covers/Api
       (show-album-covers/covers [_ k]
