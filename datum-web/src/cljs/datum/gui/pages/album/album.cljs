@@ -31,9 +31,8 @@
 
    :edit-album-tags
    (edit-album-tags/ClosedContext.
-    (reify edit-album-tags/Transaction
-      (edit-album-tags/update-context [_ f]
-        (update-store #(update % :edit-album-tags f)))))
+    (fn [f]
+      (update-store #(update % :edit-album-tags f))))
    })
 
 (defn render [store elem]

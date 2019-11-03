@@ -17,9 +17,8 @@
 
    :edit-album-tags
    (edit-album-tags/ClosedContext.
-    (reify edit-album-tags/Transaction
-      (edit-album-tags/update-context [_ f]
-        (update! #(update % :edit-album-tags f)))))
+    (fn [f]
+      (update! #(update % :edit-album-tags f))))
 
    :search-albums
    (show-album-covers/->Context

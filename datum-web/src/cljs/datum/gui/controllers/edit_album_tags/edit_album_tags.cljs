@@ -1,69 +1,79 @@
 (ns datum.gui.controllers.edit-album-tags
-  (:require [datum.tag :as tag]
+  (:require [reagent.core :as r]
+            [cljsjs.react-modal]
+            [datum.tag :as tag]
             [datum.gui.controllers.edit-album-tags.loading :as loading]
             [datum.gui.controllers.edit-album-tags.editing :as editing]
-            [datum.gui.controllers.edit-album-tags.saving :as saving]
-            [datum.gui.controllers.edit-album-tags.components
-             :as components]))
+            [datum.gui.controllers.edit-album-tags.saving :as saving]))
 
-(defprotocol Transaction
-  (update-context [this f]))
+(defrecord ClosedContext [update-context])
 
-(defn get-context [tran context-getter]
-  (letfn [(consume-without-modification [context]
-            (context-getter context)
-            context)]
-    (update-context tran consume-without-modification)))
-
-
-(defrecord ClosedContext [transaction])
-
-(defn saving-context [tran album-id attached-tags]
-  (saving/Context.
-   (saving/State. ::saving/saving)
-
-   #(update-context tran %)
+(defn saving-context [update-context album-id attached-tags]
+  (saving/->Context
 
    album-id
 
    attached-tags
 
    (fn []
-     (update-context tran #(ClosedContext. tran)))))
+     (update-context #(->ClosedContext update-context)))))
 
-(defn editing-context [tran album-id tags attached-tags]
-  (editing/Context.
-   (editing/State. tags (tag/AttachedTagSet. attached-tags) "")
+(defn editing-context [update-context album-id tags attached-tags]
+  (editing/->Context
 
-   #(update-context tran %)
+   (editing/->StateContainer
+    (editing/->State tags (tag/->AttachedTagSet attached-tags) "")
+    (fn [f]
+      (update-context #(update-in % [:state-container :state] f))))
 
    (fn [attached-tags]
-     (update-context tran #(saving-context tran album-id attached-tags)))
+     (update-context #(saving-context update-context album-id attached-tags)))
 
    (fn []
-     (update-context tran #(ClosedContext. tran)))))
+     (update-context #(->ClosedContext update-context)))))
 
-(defn loading-context [tran album-id]
-  (loading/Context.
-   nil
-
-   #(get-context tran %)
-
-   #(update-context tran %)
+(defn loading-context [update-context album-id]
+  (loading/->Context
 
    album-id
 
+   (loading/->StateContainer
+    (loading/->State nil nil)
+    (fn [f]
+      (update-context #(update-in % [:state-container :state] f)))
+    (fn [f]
+      (letfn [(update-without-modification [state]
+                (f state)
+                state)]
+        (update-context #(update-in % [:state-container :state]
+                                    update-without-modification)))))
+
    (fn [tags attached-tags]
-     (update-context tran #(editing-context
-                            tran album-id tags attached-tags)))))
+     (update-context #(editing-context update-context
+                                       album-id tags attached-tags)))))
 
 
 (defn start [context album-id]
   (when (= (type context) ClosedContext)
-    (let [tran (:transaction context)]
-      (update-context tran #(loading-context tran album-id)))))
+    (let [update-context (:update-context context)]
+      (update-context #(loading-context update-context album-id)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn modal-footer [{:keys [on-cancel on-save]}]
+  [:div {:class "modal-footer"}
+   [:div {:class "form-row align-items-center"}
+    [:div {:class "col-auto"}
+     [:button {:class "btn"
+               :on-click on-cancel
+               :disabled (not on-cancel)}
+      "Cancel"]]
+
+    [:div {:class "col-auto"}
+     [:button {:class "btn btn-primary"
+               :on-click on-save
+               :disabled (not on-save)}
+      "Save"]]]])
 
 (defmulti modal
   (fn [context] (type context)))
@@ -72,10 +82,34 @@
   nil)
 
 (defmethod modal loading/Context [context]
-  [components/loading-modal context])
+  (r/create-element
+   js/ReactModal
+   ;; TODO: Should handle close request while loading?
+   #js {:isOpen true
+        :contentLabel "Tags"}
+   (r/as-element
+    [:div
+     [loading/component context]])))
 
 (defmethod modal editing/Context [context]
-  [components/editing-modal context])
+  (r/create-element
+   js/ReactModal
+   #js {:isOpen true
+        :contentLabel "Tags"
+        :onRequestClose #(editing/cancel context)}
+   (r/as-element
+    [:div
+     [editing/component context]
+     [modal-footer {:on-save #(editing/save context)
+                    :on-cancel #(editing/cancel context)}]])))
+
 
 (defmethod modal saving/Context [context]
-  [components/saving-modal context])
+  (r/create-element
+   js/ReactModal
+   ;; TODO: Should handle close request while saving?
+   #js {:isOpen true
+        :contentLabel "Tags"}
+   (r/as-element
+    [:div
+     [saving/component context]])))

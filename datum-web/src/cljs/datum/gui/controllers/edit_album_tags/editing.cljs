@@ -4,11 +4,12 @@
 
 (defrecord State [tags attached-tag-set new-name])
 
-(defrecord Context [state update-context on-save on-cancel])
+(defrecord StateContainer [state update])
+
+(defrecord Context [state-container on-save on-cancel])
 
 (defn update-state [context f]
-  (let [update-context (:update-context context)]
-    (update-context #(update % :state f))))
+  ((-> context :state-container :update) f))
 
 (defn refresh-tags [context]
   (datum.tag.api/tags
@@ -37,8 +38,47 @@
 
 
 (defn save [context]
-  (let [{:keys [on-save state]} context]
-    (on-save (tag/attached-tags (-> state :attached-tag-set)))))
+  (let [{:keys [on-save state-container]} context]
+    (let [{:keys [state]} state-container]
+      (on-save (tag/attached-tags (-> state :attached-tag-set))))))
 
 (defn cancel [context]
   ((:on-cancel context)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn component [context]
+  [:div
+   (let [{:keys [new-name]}
+         (-> context :state-container :state)]
+     [:div {:class "input-group"}
+      [:input {:type "text"
+               :class "form-control"
+               :value new-name
+               :on-change #(change-name context (.-value (.-target %)))}]
+      [:div {:class "input-group-append"}
+       [:button {:type "button"
+                 :class"btn btn-primary"
+                 :on-click #(add-tag context)}
+        [:span {:class "oi oi-plus"}]]]])
+   [:ul {:class "list-group"}
+    (let [{:keys [tags attached-tag-set]}
+          (-> context :state-container :state)]
+      (for [tag tags]
+        (let [attached-p (datum.tag/attached-p attached-tag-set tag)
+              on-toggle  (if attached-p
+                           #(detach-tag context tag)
+                           #(attach-tag context tag))
+              on-delete  #(delete-tag context tag)]
+          ^{:key (:tag-id tag)}
+          [:li {:class "list-group-item"}
+           [:label
+            [:input {:type "checkbox"
+                     :checked attached-p
+                     :on-change on-toggle}]
+            (:name tag)]
+           [:div {:class "float-right"}
+            [:button {:type "button"
+                      :class "btn btn-danger btn-sm"
+                      :on-click on-delete}
+             [:span {:class "oi oi-delete"}]]]])))]])
