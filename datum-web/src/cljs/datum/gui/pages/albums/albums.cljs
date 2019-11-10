@@ -21,12 +21,12 @@
       (update! #(update % :edit-album-tags f))))
 
    :search-albums
-   (show-album-covers/->Context
-    (search-albums/->State keyword)
-
-    (fn [f]
-      (update! #(update-in % [:search-albums :state] f)))
-
+   (search-albums/->Context
+    (search-albums/->StateContainer
+     (search-albums/->State keyword)
+     (fn [f]
+       (update!
+        #(update-in % [:search-albums :state-container :state] f))))
     (fn [url]
       (set! (.-location js/window) url)))
    })
@@ -40,11 +40,11 @@
 
    :show-album-covers
    (show-album-covers/->Context
-    nil
-
-    (fn [f]
-      (update! #(update-in % [:show-album-covers :state] f)))
-
+    (show-album-covers/->StateContainer
+     nil
+     (fn [f]
+       (update!
+        #(update-in % [:show-album-covers :state-container :state] f))))
     (reify show-album-covers/Api
       (show-album-covers/covers [_ k]
         (datum.album.api/covers offset count k))))
@@ -52,12 +52,12 @@
 
 (defn create-truth-search [update!]
   {:show-album-covers
-   (show-album-covers/Context.
-    nil
-
-    (fn [f]
-      (update! #(update-in % [:show-album-covers :state] f)))
-
+   (show-album-covers/->Context
+    (show-album-covers/->StateContainer
+     nil
+     (fn [f]
+       (update!
+        #(update-in % [:show-album-covers :state-container :state] f))))
     (reify show-album-covers/Api
       (show-album-covers/covers [_ k]
         (datum.album.api/search keyword k))))

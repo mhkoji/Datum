@@ -6,8 +6,6 @@
             [datum.gui.components.header.state :as header]
             [datum.gui.components.header.reagent :refer [header-component]]
             [datum.gui.components.tag :as tag]
-            [datum.gui.components.album :refer [covers-component]]
-            [datum.gui.url :as url]
             [datum.gui.pages.util :as util]))
 
 (defn ops-component [{:keys [on-edit on-delete]}]
@@ -41,19 +39,14 @@
         [tag/menu-component (-> show-tags :state)]
 
         ;; covers
-        (let [{:keys [type covers]} (-> show-album-covers :state)]
-          [:main {:class "pt-3 px-4"}
-
-           (if (= type :loading)
-             [:div "Loading..."]
-             [:div {:class "container"}
-              [covers-component covers]])])
-        ]])
+        [:main {:class "pt-3 px-4"}
+         [:div {:class "container"}
+          [show-album-covers/component show-album-covers nil]]]]])
     }))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn create-store [update-store tag-id]
+(defn create-store [update! tag-id]
   {:header
    (header/get-state :tag)
 
@@ -63,7 +56,7 @@
 
     (reify show-tags/Transaction
       (show-tags/update-context [_ f]
-        (update-store #(update % :show-tags f))))
+        (update! #(update % :show-tags f))))
 
     (reify show-tags/Api
       (show-tags/tags [_ k]
@@ -72,12 +65,12 @@
     tag-id)
 
    :show-album-covers
-   (show-album-covers/Context.
-    nil
-
-    (fn [f]
-      (update-store #(update-in % [:show-album-covers :state] f)))
-
+   (show-album-covers/->Context
+    (show-album-covers/->StateContainer
+     nil
+     (fn [f]
+       (update!
+        #(update-in % [:show-album-covers :state-container :state] f))))
     (reify show-album-covers/Api
       (show-album-covers/covers [_ k]
         (datum.tag.api/albums tag-id k))))

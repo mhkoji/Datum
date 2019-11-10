@@ -3,14 +3,16 @@
 
 (defrecord State [keyword])
 
-(defrecord Context [state update-state redirect-to])
+(defrecord StateContainer [state update])
+
+(defrecord Context [state-container redirect-to])
 
 (defn change-keyword [context keyword]
-  ((:update-state context) #(assoc % :keyword keyword)))
+  ((-> context :state-container :update) #(assoc % :keyword keyword)))
 
 (defn start-searching [context]
-  (when-let [{:keys [keyword]} (:state context)]
-    ((:redirect-to context) (url/albums-search keyword))))
+  (when-let [{:keys [keyword]} (-> context :state-container :state)]
+    ((-> context :redirect-to) (url/albums-search keyword))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -20,7 +22,7 @@
           (handle-submit [evt]
             (.preventDefault evt)
             (start-searching context))]
-    (let [{:keys [keyword]} (:state context)]
+    (let [{:keys [keyword]} (-> context :state-container :state)]
       [:form {:class "form-inline my-2 my-lg-0"
               :on-submit handle-submit}
        [:input {:class "form-control mr-sm-2"

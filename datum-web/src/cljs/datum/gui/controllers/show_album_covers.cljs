@@ -14,7 +14,9 @@
 (defrecord Loaded [covers])
 
 
-(defrecord Context [state update-state api])
+(defrecord StateContainer [state update])
+
+(defrecord Context [state-container api])
 
 
 (defn call-partitioned [xs on-processing on-finished]
@@ -25,21 +27,25 @@
               (<! (timeout 100))
               (recur rest))))))
 
+(defn update-state [context f]
+  ((-> context :state-container :update) f))
+
 (defn run [context]
-  ((:update-state context) #(->Fetching))
+  (update-state context #(->Fetching))
   (covers (:api context)
    (fn [covers]
-     ((:update-state context) #(->Appending []))
+     (update-state context #(->Appending []))
      (call-partitioned covers
       (fn [sub]
-        ((:update-state context) #(update % :covers concat sub)))
+        (update-state context #(update % :covers concat sub)))
       (fn []
-        ((:update-state context) #(->Loaded (:covers %))))))))
+        (update-state context #(->Loaded (:covers %))))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defmulti component (fn [context _] (type (:state context))))
+(defmulti component (fn [context _]
+                      (type (-> context :state-container :state))))
 
 (defmethod component :default [context on-click-tag-button]
   nil)
@@ -50,11 +56,11 @@
    [album-components/placeholder-covers-component {:num 20}]])
 
 (defmethod component Appending [context on-click-tag-button]
-  (let [{:keys [covers]} (:state context)]
+  (let [{:keys [covers]} (-> context :state-container :state)]
     [album-components/covers-component covers on-click-tag-button]))
 
 (defmethod component Loaded [context on-click-tag-button]
-  (let [{:keys [covers]} (:state context)]
+  (let [{:keys [covers]} (-> context :state-container :state)]
     (if (empty? covers)
       [:div "EMPTY!"]
       [album-components/covers-component covers on-click-tag-button])))
