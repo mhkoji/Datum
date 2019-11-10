@@ -1,17 +1,16 @@
 (ns datum.gui.controllers.show-tags
-  (:require [datum.gui.url :as url]))
+  (:require [datum.gui.url :as url]
+            [datum.gui.components.tag :as components]))
 
 (defprotocol Api
   (tags [this k]))
 
-(defprotocol Transaction
-  (update-context [this f]))
+(defrecord StateContainer [state update])
 
-(defrecord Context [state transaction api selected-tag-id])
+(defrecord Context [state-container api selected-tag-id])
 
 (defn update-state [context f]
-  (update-context (-> context :transaction) #(update % :state f)))
-
+  ((-> context :state-container :update) f))
 
 (defn run [context]
   (let [{:keys [api selected-tag-id]} context]
@@ -29,3 +28,9 @@
                            :selected-p (= (:tag-id tag) selected-tag-id)})
                         tags)]
          (update-state context #(update % :items concat items)))))))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn component [context]
+  [components/menu-component (-> context :state-container :state)])

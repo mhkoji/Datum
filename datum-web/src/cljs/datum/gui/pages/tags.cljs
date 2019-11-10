@@ -6,7 +6,6 @@
             [datum.gui.controllers.show-album-covers :as show-album-covers]
             [datum.gui.components.header.state :as header]
             [datum.gui.components.header.reagent :refer [header-component]]
-            [datum.gui.components.tag :as tag]
             [datum.gui.pages.util :as util]))
 
 (defn page [{:keys [show-tags show-album-covers]}]
@@ -25,7 +24,7 @@
        [:main {:class "pt-3 px-4"}
         [:h1 {:class "h2"} "Tags"]
 
-        [tag/menu-component (-> show-tags :state)]
+        [show-tags/component show-tags]
 
         ;; covers
         [:main {:class "pt-3 px-4"}
@@ -40,17 +39,15 @@
    (header/get-state :tag)
 
    :show-tags
-   (show-tags/Context.
-    nil
-
-    (reify show-tags/Transaction
-      (show-tags/update-context [_ f]
-        (update! #(update % :show-tags f))))
-
+   (show-tags/->Context
+    (show-tags/->StateContainer
+     nil
+     (fn [f]
+       (update!
+        #(update-in % [:show-tags :state-container :state] f))))
     (reify show-tags/Api
       (show-tags/tags [_ k]
         (datum.tag.api/tags k)))
-
     nil)
 
    :show-album-covers
