@@ -10,47 +10,43 @@
 
 (defn saving-context [update-context album-id attached-tags]
   (saving/->Context
-
    album-id
-
    attached-tags
-
    (fn []
-     (update-context #(->ClosedContext update-context)))))
+     (update-context
+      #(->ClosedContext update-context)))))
 
 (defn editing-context [update-context album-id tags attached-tags]
   (editing/->Context
-
    (editing/->StateContainer
     (editing/->State tags (tag/->AttachedTagSet attached-tags) "")
     (fn [f]
-      (update-context #(update-in % [:state-container :state] f))))
-
+      (update-context
+       #(update-in % [:state-container :state] f))))
    (fn [attached-tags]
-     (update-context #(saving-context update-context album-id attached-tags)))
-
+     (update-context
+      #(saving-context update-context album-id attached-tags)))
    (fn []
-     (update-context #(->ClosedContext update-context)))))
+     (update-context
+      #(->ClosedContext update-context)))))
 
 (defn loading-context [update-context album-id]
   (loading/->Context
-
    album-id
-
    (loading/->StateContainer
     (loading/->State nil nil)
     (fn [f]
-      (update-context #(update-in % [:state-container :state] f)))
+      (update-context
+       #(update-in % [:state-container :state] f)))
     (fn [f]
-      (letfn [(update-without-modification [state]
+      (letfn [(consume-f [state]
                 (f state)
                 state)]
-        (update-context #(update-in % [:state-container :state]
-                                    update-without-modification)))))
-
+        (update-context
+         #(update-in % [:state-container :state] consume-f)))))
    (fn [tags attached-tags]
-     (update-context #(editing-context update-context
-                                       album-id tags attached-tags)))))
+     (update-context
+      #(editing-context update-context album-id tags attached-tags)))))
 
 
 (defn start [context album-id]
