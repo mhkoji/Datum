@@ -50,7 +50,7 @@
         (datum.album.api/covers offset count k))))
    })
 
-(defn create-truth-search [update!]
+(defn create-truth-search [update! keyword]
   {:show-album-covers
    (show-album-covers/->Context
     (show-album-covers/->StateContainer
@@ -75,7 +75,7 @@
           keyword (.get query-data "keyword")]
       (if keyword
         #(merge (create-truth % keyword)
-                (create-truth-search %))
+                (create-truth-search % keyword))
         (let [offset (read-string (.get query-data "offset" "0"))
               count (read-string (.get query-data "count" "500"))]
           #(merge (create-truth % nil)
