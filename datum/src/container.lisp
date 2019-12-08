@@ -25,7 +25,7 @@
 (defmethod datum.album:container-thumbnail-repository ((c container))
   (make-image-repository c))
 
-(defmethod datum.album:container-entity-repository ((c container))
+(defmethod datum.album:container-image-repository ((c container))
   (make-image-repository c))
 
 

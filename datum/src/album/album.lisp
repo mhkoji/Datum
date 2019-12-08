@@ -8,7 +8,7 @@
            :container
            :container-db
            :container-thumbnail-repository
-           :container-entity-repository
+           :container-image-repository
            :save-albums
            :delete-albums
 
@@ -73,7 +73,7 @@
 (defclass container () ())
 (defgeneric container-db (c))
 (defgeneric container-thumbnail-repository (c))
-(defgeneric container-entity-repository (c))
+(defgeneric container-image-repository (c))
 
 (defmethod loader-db ((c container))
   (container-db c))
@@ -87,9 +87,9 @@
 
 (defun delete-albums (container album-ids)
   (let ((db (container-db container))
-        (entity-repos (container-entity-repository container))
+        (image-repos (container-image-repository container))
         (thumbnail-repos (container-thumbnail-repository container)))
-    (datum.album.pictures:delete-by-album-ids db entity-repos album-ids)
+    (datum.album.pictures:delete-by-album-ids db image-repos album-ids)
     (datum.album.repository:delete-albums db album-ids thumbnail-repos)))
 
 
@@ -109,7 +109,7 @@
 
 (defun album-pictures (container album)
   (datum.album.pictures:load-by-album (container-db container)
-                                      (container-entity-repository container)
+                                      (container-image-repository container)
                                       album))
 
 ;;; Others

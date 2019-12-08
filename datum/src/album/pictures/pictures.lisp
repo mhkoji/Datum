@@ -7,29 +7,21 @@
            :append-to-album))
 (in-package :datum.album.pictures)
 
-;;; A picture is an entity who plays the following roles.
-(defgeneric picture-id (entity))
-
-(defgeneric load-by-ids (entity-repos picture-ids))
-
-(defgeneric delete-by-ids (entity-repos picture-ids))
-
-
 ;;; In this context, an album is an object which has its unique id.
 (defgeneric album-id (album))
 
-(defun load-by-album (db entity-repos album)
-  (let ((picture-ids (datum.album.pictures.db:select-pictures
-                      db (list (album-id album)))))
-    (load-by-ids entity-repos picture-ids)))
+(defun load-by-album (db image-repos album)
+  (let ((image-ids (datum.album.pictures.db:select-pictures
+                    db (list (album-id album)))))
+    (datum.image:load-images-by-ids image-repos image-ids)))
 
-(defun delete-by-album-ids (db entity-repos album-ids)
-  (let ((picture-ids (datum.album.pictures.db:select-pictures
-                      db album-ids)))
-    (datum.album.pictures.db:delete-pictures db album-ids)
-    (delete-by-ids entity-repos picture-ids)))
+(defun delete-by-album-ids (db image-repos album-ids)
+  (datum.album.pictures.db:delete-pictures db album-ids)
+  (let ((image-ids (datum.album.pictures.db:select-pictures
+                    db album-ids)))
+    (datum.image:delete-images image-repos image-ids)))
 
-(defun append-to-album (db album entities)
+(defun append-to-album (db album images)
   (let ((album-id (album-id album))
-        (picture-ids (mapcar #'picture-id entities)))
-    (datum.album.pictures.db:insert-pictures db album-id picture-ids)))
+        (image-ids (mapcar #'datum.image:image-id images)))
+    (datum.album.pictures.db:insert-pictures db album-id image-ids)))

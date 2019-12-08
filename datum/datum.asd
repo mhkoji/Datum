@@ -7,12 +7,9 @@
    (:module :album
     :pathname "album"
     :components
-    ((:file "pictures/db/db")
-     (:file "pictures/pictures")
-     (:file "thumbnail/thumbnail")
+    ((:file "thumbnail/thumbnail")
      (:file "db/db")
-     (:file "repository")
-     (:file "album")))
+     (:file "repository")))
 
    (:module :image
     :pathname "image"
@@ -24,8 +21,7 @@
     :pathname "tag"
     :components
     ((:file "db/db")
-     (:file "tag")
-     (:file "contents")))
+     (:file "tag")))
 
    (:file "stream")
 
@@ -41,10 +37,14 @@
     ((:file "db/db")
      (:file "access-log")))
 
+   (:file "album/pictures/db/db")
+   (:file "album/pictures/pictures")
+   (:file "album/album")
    (:file "album/thumbnail/entities")
-   (:file "album/pictures/entities")
    (:file "album/pictures/db/mito")
    (:file "album/db/mito")
+
+   (:file "tag/contents")
 
    (:file "image/db/mito")
 
