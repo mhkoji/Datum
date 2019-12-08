@@ -57,18 +57,18 @@
    ids
    (loader-thumbnail-repository loader)))
 
+(defun load-albums-by-listing-ids (loader list-ids-fn)
+  (load-albums-by-ids loader (funcall list-ids-fn)))
+
 (defun load-albums-by-range (loader offset count)
-  (let ((ids (datum.album.db:select-album-ids (loader-db loader)
-                                              offset
-                                              count)))
-    (load-albums-by-ids loader ids)))
+  (load-albums-by-listing-ids loader
+   (lambda ()
+     (datum.album.db:select-album-ids (loader-db loader) offset count))))
 
 (defun search-albums (loader name)
-  (let ((ids (datum.album.db:select-album-ids-by-like
-              (loader-db loader)
-              name)))
-    (load-albums-by-ids loader ids)))
-
+  (load-albums-by-listing-ids loader
+   (lambda ()
+     (datum.album.db:select-album-ids-by-like (loader-db loader) name))))
 
 (defclass container () ())
 (defgeneric container-db (c))
