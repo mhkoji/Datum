@@ -45,7 +45,7 @@
 (defun dao->tag-content-row (obj)
   (make-tag-content-row
    :tag-id (tag-content-tag-id obj)
-   :content-id (tag-content-content-id obj)
+   :content-id (datum.id:from-string (tag-content-content-id obj))
    :content-type (string-upcase (tag-content-content-type obj))))
 
 (defmethod select-tag-rows-by-content ((db <dbi-connection>) content-id)
@@ -53,7 +53,9 @@
           (mito:select-dao 'tag
             (sxql:inner-join :tag-content
              :on (:= :tag.id :tag-content.tag-id))
-            (sxql:where (:= :tag-content.content-id content-id)))))
+            (sxql:where
+             (:= :tag-content.content-id
+                 (datum.id:to-string content-id))))))
 
 (defmethod select-tag-content-rows ((db <dbi-connection>) tag-id)
   (mapcar #'dao->tag-content-row
@@ -64,7 +66,8 @@
   (dolist (row rows)
     (mito:create-dao 'tag-content
                      :tag-id (tag-content-row-tag-id row)
-                     :content-id (tag-content-row-content-id row)
+                     :content-id (datum.id:to-string
+                                  (tag-content-row-content-id row))
                      :content-type (tag-content-row-content-type row))))
 
 (defmethod delete-tag-content-rows-by-tags ((db <dbi-connection>)
@@ -75,4 +78,5 @@
 (defmethod delete-tag-content-rows-by-contents ((db <dbi-connection>)
                                                 (content-ids list))
   (dolist (content-id content-ids)
-    (mito:delete-by-values 'tag-content :content-id content-id)))
+    (mito:delete-by-values 'tag-content
+                           :content-id (datum.id:to-string content-id))))

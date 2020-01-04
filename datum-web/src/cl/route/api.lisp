@@ -19,20 +19,24 @@
    :perform (datum.app.album:search conf keyword))
   (route app "/api/album/:id/overview"
    :args ((id (:param :id)))
-   :perform (datum.app.album:overview conf id))
+   :perform (datum.app.album:overview
+             conf (datum.id:from-string-short id)))
   (route app "/api/album/:id/tags"
    :args ((id (:param :id)))
-   :perform (datum.app.album:tags conf id))
+   :perform (datum.app.album:tags
+             conf (datum.id:from-string-short id)))
   (route app "/api/album/:id/tags"
    :method :put
    :args ((id (:param :id))
           (tag-ids (:query "tag_ids")))
-   :perform (datum.app.album:set-tags conf id tag-ids)))
+   :perform (datum.app.album:set-tags
+             conf (datum.id:from-string-short id) tag-ids)))
 
 (defun route-image (app conf)
   (route app "/api/image/:id"
    :args ((id (:param :id)))
-   :perform (datum.app.image:path conf id)
+   :perform (datum.app.image:path
+             conf (datum.id:from-string-short id))
    :output #'as-file))
 
 (defun route-tag (app conf)

@@ -130,10 +130,9 @@
 
 (defstruct source name thumbnail updated-at)
 
-(defun create-albums (id-generator sources)
+(defun create-albums (sources)
   (let ((album-ids (mapcar (lambda (source)
-                             (datum.id:gen id-generator
-                                           (source-name source)))
+                             (datum.id:gen (source-name source)))
                            sources)))
     (mapcar (lambda (album-id source)
               (datum.album.repository:make-album

@@ -18,12 +18,12 @@
 (defmethod as-jsown ((obj datum.image:image))
   (let ((image-id (datum.image:image-id obj)))
     (jsown:new-js
-      ("image-id" image-id))))
+      ("image-id" (datum.id:to-string-short image-id)))))
 
 (defmethod as-jsown ((obj datum.album:cover))
   (jsown:new-js
     ("album-id"
-     (datum.album:cover-album-id obj))
+     (datum.id:to-string-short (datum.album:cover-album-id obj)))
     ("name"
      (datum.album:cover-name obj))
     ("thumbnail"
@@ -32,7 +32,7 @@
 (defmethod as-jsown ((obj datum.album:overview))
   (jsown:new-js
     ("album-id"
-     (datum.album:overview-album-id obj))
+     (datum.id:to-string-short (datum.album:overview-album-id obj)))
     ("name"
      (datum.album:overview-name obj))
     ("pictures"

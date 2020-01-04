@@ -15,16 +15,19 @@
 (defmethod insert-images ((db <dbi-connection>) (images list))
   (dolist (image images)
     (mito:create-dao '%image
-                     :image-id (image-id image)
+                     :image-id (datum.id:to-string (image-id image))
                      :path (image-path image))))
 
 (defmethod select-images ((db <dbi-connection>) (image-ids list))
   (let ((objects (mito:select-dao '%image
-                   (sxql:where (:in :image-id image-ids)))))
+                   (sxql:where (:in :image-id (mapcar #'datum.id:to-string
+                                                      image-ids))))))
     (mapcar (lambda (obj)
-              (make-image :id (%image-id obj) :path (%image-path obj)))
+              (make-image :id (datum.id:from-string (%image-id obj))
+                          :path (%image-path obj)))
             objects)))
 
 (defmethod delete-images ((db <dbi-connection>) (image-ids list))
   (dolist (image-id image-ids)
-    (mito:delete-by-values '%image :image-id image-id)))
+    (mito:delete-by-values '%image
+                           :image-id (datum.id:to-string image-id))))

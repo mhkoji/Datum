@@ -17,7 +17,7 @@
 
 (defmethod insert ((db <dbi-connection>) resource accessed-at)
   (mito:create-dao 'access-log-record
-                   :resource-id   (resource-id resource)
+                   :resource-id   (datum.id:to-string (resource-id resource))
                    :resource-type (resource-type resource)
                    :accessed-at   accessed-at))
 
@@ -34,5 +34,6 @@
       (loop for row = (dbi:fetch result)
             while row
             collect (make-access-count
-                     :resource-id (getf row :|resource_id|)
+                     :resource-id (datum.id:from-string
+                                   (getf row :|resource_id|))
                      :count (getf row :|count|))))))

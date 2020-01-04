@@ -3,13 +3,11 @@
   (:export :load-configure
            :make-configure
            :configure-thumbnail-root
-           :configure-id-generator
            :with-container
            :initialize))
 (in-package :datum.app)
 
 (defstruct configure
-  id-generator
   db-factory
   thumbnail-root)
 
@@ -23,6 +21,8 @@
 (defmacro with-container ((container conf) &body body)
   `(datum.db:with-db (db (configure-db-factory ,conf))
      (let ((,container (make-instance 'datum.container:container
+                                      :thumbnail-dir
+                                      (configure-thumbnail-root ,conf)
                                       :db db)))
        ,@body)))
 

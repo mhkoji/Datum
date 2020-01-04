@@ -42,10 +42,8 @@
   (container-db c))
 
 
-(defun create-images (id-generator paths)
-  (let ((image-ids (mapcar (lambda (path)
-                             (datum.id:gen id-generator path))
-                           paths)))
+(defun create-images (paths)
+  (let ((image-ids (mapcar #'datum.id:gen paths)))
     (mapcar (lambda (id path)
               (datum.image.db:make-image :id id :path path))
             image-ids paths)))

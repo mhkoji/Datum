@@ -2,7 +2,8 @@
   :serial t
   :pathname "src"
   :components
-  ((:file "id")
+  ((:file "id/uuid")
+   ;(:file "id/sha256")
 
    (:module :album
     :pathname "album"
@@ -74,4 +75,6 @@
   :depends-on (:babel
                :ironclad
                :mito
-               :log4cl))
+               :log4cl
+               :uuid
+               :cl-base64))

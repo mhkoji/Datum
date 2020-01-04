@@ -66,11 +66,20 @@
            tag-ids)))
 
 
+(defun make-id-hash-table ()
+  (make-hash-table :test #'equal))
+
+(defun id-gethash (id hash)
+  (gethash (datum.id:to-string id) hash))
+
+(defun (setf id-gethash) (val id hash)
+  (setf (gethash (datum.id:to-string id) hash) val))
+
 (defun tag-contents (container tag)
   (let ((content-rows (datum.tag.db:select-tag-content-rows
                        (container-db container)
                        (tag-id tag)))
-        (content-id->content (make-hash-table :test #'equal)))
+        (content-id->content (make-id-hash-table)))
     (let ((type->content-ids (make-hash-table)))
       (dolist (row content-rows)
         (let ((type (alexandria:make-keyword
@@ -82,12 +91,12 @@
                                           type
                                           (gethash type type->content-ids))
             do (dolist (content contents)
-                 (setf (gethash (content-id content) content-id->content)
+                 (setf (id-gethash (content-id content) content-id->content)
                        content))))
     (let ((content-ids (mapcar #'datum.tag.db:tag-content-row-content-id
                                content-rows)))
       (loop for content-id in content-ids
-            for content = (gethash content-id content-id->content)
+            for content = (id-gethash content-id content-id->content)
             when content
          collect content))))
 

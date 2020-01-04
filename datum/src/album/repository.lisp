@@ -24,6 +24,7 @@
    :thumbnail-id (datum.album.thumbnail:thumbnail-id
                   (album-thumbnail album))))
 
+
 (defun save-albums (db albums)
   (insert-album-rows
    db (mapcar #'album->album-row albums))
@@ -32,32 +33,40 @@
               (remove-if-not #'album-thumbnail albums))))
 
 
+(defun make-id-hash-table ()
+  (make-hash-table :test #'equal))
+
+(defun id-gethash (id hash)
+  (gethash (datum.id:to-string id) hash))
+
+(defun (setf id-gethash) (val id hash)
+  (setf (gethash (datum.id:to-string id) hash) val))
+
 (defun load-albums (db ids thumbnail-repository)
-  (let ((album-id->args (make-hash-table :test #'equal)))
+  (let ((album-id->args (make-id-hash-table)))
     (let ((rows (select-album-rows db ids)))
       (dolist (row rows)
         (let ((album-id (album-row-id row)))
-          (alexandria:appendf (gethash album-id album-id->args)
+          (alexandria:appendf (id-gethash album-id album-id->args)
            (list :id (album-row-id row)
                  :name (album-row-name row)
                  :updated-at (album-row-updated-at row))))))
     (let ((rows (select-album-thumbnail-rows db ids))
-          (id->thumbnail (make-hash-table :test #'equal)))
+          (id->thumbnail (make-id-hash-table)))
       (let ((thumbnails (datum.album.thumbnail:load-by-ids
                          thumbnail-repository
                          (mapcar #'album-thumbnail-row-thumbnail-id rows))))
         (dolist (thumbnail thumbnails)
-          (setf (gethash (datum.album.thumbnail:thumbnail-id thumbnail)
-                         id->thumbnail)
-                thumbnail)))
+          (let ((thumbnail-id
+                 (datum.album.thumbnail:thumbnail-id thumbnail)))
+            (setf (id-gethash thumbnail-id id->thumbnail) thumbnail))))
       (dolist (row rows)
         (let ((album-id (album-thumbnail-row-album-id row))
               (thumbnail-id (album-thumbnail-row-thumbnail-id row)))
-          (alexandria:appendf (gethash album-id album-id->args)
-           (list :thumbnail (gethash thumbnail-id id->thumbnail))))))
+          (alexandria:appendf (id-gethash album-id album-id->args)
+           (list :thumbnail (id-gethash thumbnail-id id->thumbnail))))))
     (mapcar (lambda (album-id)
-              (apply #'make-album
-                     (gethash album-id album-id->args)))
+              (apply #'make-album (id-gethash album-id album-id->args)))
             ids)))
 
 
