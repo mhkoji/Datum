@@ -30,7 +30,7 @@
   (update-state context #(assoc % :new-name name)))
 
 (defn add-tag [context]
-  (let [name (-> context :state :new-name)]
+  (let [name (-> context :state-container :state :new-name)]
     (datum.tag.api/put-tags name
      (fn [_]
        (update-state context #(assoc % :new-name ""))
