@@ -1,33 +1,39 @@
 (defpackage :datum.image.db.mito
-  (:use :cl :datum.image.db)
-  (:export :%image)
+  (:use :cl)
+  (:export :image)
   (:import-from :dbi.driver
                 :<dbi-connection>))
 (in-package :datum.image.db.mito)
 
-(defclass %image ()
+(defclass image (datum.db.mito:listed)
   ((image-id :col-type (:varchar 256)
-             :accessor %image-id)
+             :accessor image-id)
    (path :col-type (:varchar 256)
-         :accessor %image-path))
+         :accessor image-path))
   (:metaclass mito:dao-table-class))
 
-(defmethod insert-images ((db <dbi-connection>) (images list))
+(defmethod datum.image.db:insert-images ((db <dbi-connection>)
+                                         (images list))
   (dolist (image images)
-    (mito:create-dao '%image
-                     :image-id (datum.id:to-string (image-id image))
-                     :path (image-path image))))
+    (mito:create-dao 'image
+                     :image-id (datum.id:to-string
+                                (datum.image.db:image-id image))
+                     :path (datum.image.db:image-path image))))
 
-(defmethod select-images ((db <dbi-connection>) (image-ids list))
-  (let ((objects (mito:select-dao '%image
-                   (sxql:where (:in :image-id (mapcar #'datum.id:to-string
-                                                      image-ids))))))
+(defmethod datum.image.db:select-images ((db <dbi-connection>)
+                                         (image-ids list))
+  (let ((objects
+         (mito:select-dao 'image
+           (sxql:where
+            (:in :image-id (mapcar #'datum.id:to-string image-ids))))))
     (mapcar (lambda (obj)
-              (make-image :id (datum.id:from-string (%image-id obj))
-                          :path (%image-path obj)))
+              (datum.image.db:make-image
+               :id (datum.id:from-string (image-id obj))
+               :path (image-path obj)))
             objects)))
 
-(defmethod delete-images ((db <dbi-connection>) (image-ids list))
+(defmethod datum.image.db:delete-images ((db <dbi-connection>)
+                                         (image-ids list))
   (dolist (image-id image-ids)
-    (mito:delete-by-values '%image
+    (mito:delete-by-values 'image
                            :image-id (datum.id:to-string image-id))))

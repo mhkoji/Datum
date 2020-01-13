@@ -5,7 +5,7 @@
                 :<dbi-connection>))
 (in-package :datum.access-log.db.mito)
 
-(defclass access-log-record ()
+(defclass access-log-record (datum.db.mito:listed)
   ((resource-id :col-type (:varchar 256)
                 :accessor record-resource-id)
    (resource-type :col-type (:varchar 256)

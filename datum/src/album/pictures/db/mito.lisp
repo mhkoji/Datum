@@ -5,7 +5,7 @@
                 :<dbi-connection>))
 (in-package :datum.album.pictures.db.mito)
 
-(defclass album-picture ()
+(defclass album-picture (datum.db.mito:listed)
   ((album-id :col-type (:varchar 256)
              :accessor album-id)
    (picture-id :col-type (:varchar 256)

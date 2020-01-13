@@ -1,24 +1,24 @@
 (defpackage :datum.db.mito
   (:use :cl :datum.db)
-  (:export :mito-factory))
+  (:export :mito-factory
+           :listed))
 (in-package :datum.db.mito)
 
 (defclass mito-factory ()
   ((args :initarg :args
          :reader args)))
 
+(defclass listed () ())
+
+(defun list-mito-table-classes ()
+  (c2mop:class-direct-subclasses (find-class 'listed)))
+
 (defmethod connect ((factory mito-factory))
   (apply #'dbi:connect (args factory)))
 
 (defmethod initialize ((db dbi.driver:<dbi-connection>))
-  (dolist (sym (list 'datum.album.db.mito:album
-                     'datum.album.db.mito:album-thumbnail
-                     'datum.album.pictures.db.mito:album-picture
-                     'datum.image.db.mito:%image
-                     'datum.tag.db.mito:tag
-                     'datum.tag.db.mito:tag-content
-                     'datum.access-log.db.mito:access-log-record))
-    (mito:ensure-table-exists sym)))
+  (dolist (class (list-mito-table-classes))
+    (mito:ensure-table-exists class)))
 
 (defmethod disconnect ((db dbi.driver:<dbi-connection>))
   (dbi:disconnect db))

@@ -6,7 +6,7 @@
                 :<dbi-connection>))
 (in-package :datum.tag.db.mito)
 
-(defclass tag ()
+(defclass tag (datum.db.mito:listed)
   ((name :col-type (:varchar 256)
          :accessor tag-name))
   (:metaclass mito:dao-table-class))
@@ -33,7 +33,7 @@
     (mito:delete-by-values 'tag :id tag-id)))
 
 
-(defclass tag-content ()
+(defclass tag-content (datum.db.mito:listed)
   ((tag-id :col-type (:varchar 256)
            :accessor tag-content-tag-id)
    (content-id :col-type (:varchar 256)

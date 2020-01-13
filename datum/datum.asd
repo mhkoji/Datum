@@ -38,27 +38,21 @@
     ((:file "db/db")
      (:file "access-log")))
 
+   (:file "db/db")
+
    (:file "album/pictures/db/db")
    (:file "album/pictures/pictures")
    (:file "album/album")
    (:file "album/thumbnail/entities")
+   (:file "access-log/resources")
+
+   (:file "db/mito")
    (:file "album/pictures/db/mito")
    (:file "album/db/mito")
-
    (:file "tag/contents")
-
    (:file "image/db/mito")
-
    (:file "tag/db/mito")
-
-   (:file "access-log/resources")
    (:file "access-log/db/mito")
-
-   (:module :db
-    :pathname "db"
-    :components
-    ((:file "db")
-     (:file "mito")))
 
    (:file "container")
 
