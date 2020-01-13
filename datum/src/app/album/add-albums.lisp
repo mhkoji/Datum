@@ -30,8 +30,7 @@
                (when-let ((paths (dir-file-paths dir)))
                  (create-thumbnail container (car paths)))))
 
-(defun add-albums (root-dir &key (conf (datum.app:load-configure))
-                                 (sort-paths-fn #'identity))
+(defun add-albums (conf root-dir &key (sort-paths-fn #'identity))
   (with-container (container conf)
     (let ((dirs (stream-to-list (retrieve root-dir sort-paths-fn))))
       (let ((albums (create-albums
