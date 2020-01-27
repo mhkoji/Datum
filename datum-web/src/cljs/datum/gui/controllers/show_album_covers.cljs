@@ -52,8 +52,7 @@
 
 (defmethod component Fetching [context on-click-tag-button]
   [:div
-   [spinner]
-   [album-components/placeholder-covers-component {:num 20}]])
+   [spinner]])
 
 (defmethod component Appending [context on-click-tag-button]
   (let [{:keys [covers]} (-> context :state-container :state)]
