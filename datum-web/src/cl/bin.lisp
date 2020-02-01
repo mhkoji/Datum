@@ -1,30 +1,29 @@
-#!/bin/sh
-#|-*- mode:lisp -*-|#
-#|
-exec ros -Q -- $0 "$@"
-|#
-(progn ;;init forms
-  (ros:ensure-asdf)
-  ;;#+quicklisp(ql:quickload '() :silent t)
-  )
-
-(defpackage :ros.script.start.3765619716
+(defpackage :datum.web.bin
   (:use :cl))
-(in-package :ros.script.start.3765619716)
-(ql:quickload :log4cl)
-(ql:quickload :datum-app-web)
+(in-package :datum.web.bin)
 
 (defun main (&rest argv)
   (log:info "argv: ~A" argv)
   (let ((hash (alexandria:plist-hash-table argv :test #'equal))
         (start-args nil))
+
+    (setq start-args (list :use-thread nil))
+
     (alexandria:when-let ((port (gethash "--port" hash)))
       (setq start-args (list* :port (parse-integer port)
                               start-args)))
+
     (alexandria:when-let ((conf-path (gethash "--conf-path" hash)))
-      (let ((conf (datum.container:load-configure conf-path)))
+      (let ((conf (datum.app:load-configure conf-path)))
         (setq start-args (list* :conf conf
                                 start-args))))
-    (apply #'datum.app.web:start start-args)))
 
-;;; vim: set ft=lisp lisp:
+    (log:info "args: ~A" start-args)
+
+    (apply #'datum.web:start start-args)))
+
+#+sbcl
+(progn
+  (export 'sbcl-main)
+  (defun sbcl-main ()
+    (apply #'main (cdr sb-ext:*posix-argv*))))

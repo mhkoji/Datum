@@ -12,7 +12,8 @@
      (:file "api")
      (:file "asset")))
 
-   (:file "web"))
+   (:file "web")
+   (:file "bin"))
   :depends-on (:datum
 
                :cl-who
