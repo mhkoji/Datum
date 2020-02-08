@@ -2,7 +2,7 @@
   (:use :cl))
 (in-package :datum.web.bin)
 
-(defun main (&rest argv)
+(defun main (argv)
   (log:info "argv: ~A" argv)
   (let ((hash (alexandria:plist-hash-table argv :test #'equal))
         (start-args nil))
@@ -26,4 +26,4 @@
 (progn
   (export 'sbcl-main)
   (defun sbcl-main ()
-    (apply #'main (cdr sb-ext:*posix-argv*))))
+    (main (cdr sb-ext:*posix-argv*))))
