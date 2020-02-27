@@ -1,9 +1,9 @@
-(defpackage :datum.container
+(defpackage :datum.app.container
   (:use :cl)
   (:export :container
            :initialize
            :create-thumbnail-file))
-(in-package :datum.container)
+(in-package :datum.app.container)
 
 (defclass container (datum.album:container
                      datum.image:container)

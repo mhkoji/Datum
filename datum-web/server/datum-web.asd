@@ -2,7 +2,15 @@
   :serial t
   :pathname "src/cl"
   :components
-  ((:file "json")
+  ((:module :app
+    :pathname "app"
+    :components
+    ((:file "album")
+     (:file "image")
+     (:file "tag")
+     (:file "frequently-accessed")))
+
+   (:file "json")
    (:file "html")
 
    (:module :route

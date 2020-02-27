@@ -1,9 +1,9 @@
-(defpackage :datum.app.image
+(defpackage :datum.web.app.image
   (:use :cl)
   (:export :path)
-  (:import-from :datum.app
+  (:import-from :datum.app.container
                 :with-container))
-(in-package :datum.app.image)
+(in-package :datum.web.app.image)
 
 (defun path (conf id)
   (with-container (container conf)

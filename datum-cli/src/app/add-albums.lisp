@@ -1,11 +1,10 @@
-(defpackage :datum.app.album.add-albums
+(defpackage :datum.cli.app.add-albums
   (:use :cl
         :datum.album
         :datum.stream
         :datum.fs.retrieve)
-  (:import-from :datum.app.album
-                :add-albums)
-  (:import-from :datum.app
+  (:export :run)
+  (:import-from :datum.app.container
                 :with-container)
   (:import-from :datum.image
                 :save-images
@@ -30,7 +29,7 @@
                (when-let ((paths (dir-file-paths dir)))
                  (create-thumbnail container (car paths)))))
 
-(defun add-albums (conf root-dir &key (sort-paths-fn #'identity))
+(defun run (conf root-dir &key (sort-paths-fn #'identity))
   (with-container (container conf)
     (let ((dirs (stream-to-list (retrieve root-dir sort-paths-fn))))
       (let ((albums (create-albums

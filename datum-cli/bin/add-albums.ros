@@ -17,7 +17,7 @@ exec ros -Q -- $0 "$@"
   (let ((root-dir (car argv))
         (arg-hash (alexandria:plist-hash-table (cdr argv)
                                                :test #'equal)))
-    (datum.app.album:add-albums root-dir
+    (datum.cli.app.add-albums:run root-dir
      :conf (datum.app:load-configure (gethash "--conf" arg-hash)))))
 
 ;;; vim: set ft=lisp lisp:
