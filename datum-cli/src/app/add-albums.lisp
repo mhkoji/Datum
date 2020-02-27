@@ -1,10 +1,9 @@
-(defpackage :datum.app.album.add-albums
+(defpackage :datum.cli.app.add-albums
   (:use :cl
         :datum.album
         :datum.stream
         :datum.fs.retrieve)
-  (:import-from :datum.app.album
-                :add-albums)
+  (:export :run)
   (:import-from :datum.app
                 :with-container)
   (:import-from :datum.image
@@ -12,11 +11,11 @@
                 :create-images)
   (:import-from :alexandria
                 :when-let))
-(in-package :datum.app.album.add-albums)
+(in-package :datum.cli.app.add-albums)
 
 
 (defun create-thumbnail (container image-path)
-  (let ((thumbnail-path (datum.container:create-thumbnail-file
+  (let ((thumbnail-path (datum.app.container:create-thumbnail-file
                          container
                          image-path)))
     (car (create-images (list thumbnail-path)))))
@@ -30,7 +29,7 @@
                (when-let ((paths (dir-file-paths dir)))
                  (create-thumbnail container (car paths)))))
 
-(defun add-albums (conf root-dir &key (sort-paths-fn #'identity))
+(defun run (conf root-dir &key (sort-paths-fn #'identity))
   (with-container (container conf)
     (let ((dirs (stream-to-list (retrieve root-dir sort-paths-fn))))
       (let ((albums (create-albums

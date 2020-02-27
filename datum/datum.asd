@@ -54,17 +54,8 @@
    (:file "tag/db/mito")
    (:file "access-log/db/mito")
 
-   (:file "container")
-
-   (:module :app
-    :pathname "app"
-    :components
-    ((:file "app")
-     (:file "album/album")
-     (:file "album/add-albums")
-     (:file "image")
-     (:file "tag")
-     (:file "frequently-accessed"))))
+   (:file "app/container")
+   (:file "app/app"))
 
   :depends-on (:babel
                :ironclad

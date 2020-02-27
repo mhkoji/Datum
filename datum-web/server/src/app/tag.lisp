@@ -1,4 +1,4 @@
-(defpackage :datum.app.tag
+(defpackage :datum.web.app.tag
   (:use :cl)
   (:export :tags
            :add-tag
@@ -6,7 +6,7 @@
            :album-covers)
   (:import-from :datum.app
                 :with-container))
-(in-package :datum.app.tag)
+(in-package :datum.web.app.tag)
 
 (defun tags (conf)
   (with-container (container conf)

@@ -23,11 +23,9 @@ $ make
 $ cd datum-app/web
 $ mkdir -p ./target/thumbnails
 $ sbcl
-CL-USER> (ql:quickload :datum-web))
+CL-USER> (ql:quickload :datum-cli)
 CL-USER> (defvar *conf*
            (datum.app:make-configure
-            :id-generator
-            (make-instance 'datum.id:sha256-3)
             :db-factory
             (make-instance 'datum.db.mito:mito-factory
                            :args (list :sqlite3
@@ -36,7 +34,8 @@ CL-USER> (defvar *conf*
             :thumbnail-root
             (merge-pathnames "./target/thumbnails/")))
 CL-USER> (datum.app:initialize *conf*)
-CL-USER> (datum.app.album:add-albums "./resources/contents/" :conf *conf*)
+CL-USER> (datum.cli.app.add-albums:run *conf* "./resources/contents/")
+CL-USER> (ql:quickload :datum-web)
 CL-USER> (datum.web:start :conf *conf*)
 ```
 

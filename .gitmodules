@@ -1,6 +1,6 @@
-[submodule "datum-web/resources/third-party/bootstrap"]
-	path = datum-web/resources/third-party/bootstrap
+[submodule "datum-web/frontend/resources/third-party/bootstrap"]
+	path = datum-web/frontend/resources/third-party/bootstrap
 	url = https://github.com/twbs/bootstrap
-[submodule "datum-web/resources/third-party/open-iconic"]
-	path = datum-web/resources/third-party/open-iconic
+[submodule "datum-web/frontend/resources/third-party/open-iconic"]
+	path = datum-web/frontend/resources/third-party/open-iconic
 	url = https://github.com/iconic/open-iconic

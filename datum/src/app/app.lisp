@@ -20,7 +20,7 @@
 
 (defmacro with-container ((container conf) &body body)
   `(datum.db:with-db (db (configure-db-factory ,conf))
-     (let ((,container (make-instance 'datum.container:container
+     (let ((,container (make-instance 'datum.app.container:container
                                       :thumbnail-dir
                                       (configure-thumbnail-root ,conf)
                                       :db db)))
@@ -29,4 +29,4 @@
 
 (defun initialize (conf)
   (with-container (container conf)
-    (datum.container:initialize container)))
+    (datum.app.container:initialize container)))

@@ -1,8 +1,16 @@
 (asdf:defsystem :datum-web
   :serial t
-  :pathname "src/cl"
+  :pathname "src"
   :components
-  ((:file "json")
+  ((:module :app
+    :pathname "app"
+    :components
+    ((:file "album")
+     (:file "image")
+     (:file "tag")
+     (:file "frequently-accessed")))
+
+   (:file "json")
    (:file "html")
 
    (:module :route

@@ -1,4 +1,4 @@
-(defpackage :datum.app.album
+(defpackage :datum.web.app.album
   (:use :cl)
   (:shadow :search)
   (:export :add-albums
@@ -9,7 +9,7 @@
            :set-tags)
   (:import-from :datum.app
                 :with-container))
-(in-package :datum.app.album)
+(in-package :datum.web.app.album)
 
 (defun covers (conf offset count)
   (with-container (container conf)
