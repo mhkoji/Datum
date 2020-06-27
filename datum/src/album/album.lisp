@@ -35,13 +35,30 @@
 
            :make-source
            :create-albums
-           :save-albums)
-  (:import-from :datum.album.repository
-                :album
-                :album-id
-                :album-name
-                :album-thumbnail))
+           :save-albums))
 (in-package :datum.album)
+
+(defstruct album
+  id
+  name
+  updated-at
+  thumbnail)
+
+(defstruct source name thumbnail updated-at)
+
+(defun create-albums (sources)
+  (let ((album-ids (mapcar (lambda (source)
+                             (datum.id:gen (source-name source)))
+                           sources)))
+    (mapcar (lambda (album-id source)
+              (make-album
+               :id album-id
+               :name (source-name source)
+               :updated-at (source-updated-at source)
+               :thumbnail (source-thumbnail source)))
+            album-ids sources)))
+
+;;;
 
 (defclass loader ()
   ((db
@@ -52,23 +69,24 @@
     :reader loader-thumbnail-repository)))
 
 (defun load-albums-by-ids (loader ids)
-  (datum.album.repository:load-albums
-   (loader-db loader)
-   ids
-   (loader-thumbnail-repository loader)))
-
-(defun load-albums-by-listing-ids (loader list-ids-fn)
-  (load-albums-by-ids loader (funcall list-ids-fn)))
+  (datum.album.db:load-albums-by-ids (loader-db loader)
+                                     ids
+                                     (loader-thumbnail-repository loader)
+                                     (lambda (args)
+                                       (apply #'make-album args))))
 
 (defun load-albums-by-range (loader offset count)
-  (load-albums-by-listing-ids loader
-   (lambda ()
-     (datum.album.db:select-album-ids (loader-db loader) offset count))))
+  (load-albums-by-ids
+   loader
+   (datum.album.db:select-album-ids (loader-db loader) offset count)))
 
 (defun search-albums (loader name)
-  (load-albums-by-listing-ids loader
-   (lambda ()
-     (datum.album.db:select-album-ids-by-like (loader-db loader) name))))
+  (load-albums-by-ids
+   loader
+   (datum.album.db:select-album-ids-by-like (loader-db loader) name)))
+
+
+;;;
 
 (defclass container () ())
 (defgeneric container-db (c))
@@ -82,7 +100,7 @@
   (container-thumbnail-repository c))
 
 (defun save-albums (container albums)
-  (datum.album.repository:save-albums (container-db container) albums))
+  (datum.album.db:save-albums (container-db container) albums))
 
 
 (defun delete-albums (container album-ids)
@@ -90,7 +108,7 @@
         (image-repos (container-image-repository container))
         (thumbnail-repos (container-thumbnail-repository container)))
     (datum.album.pictures:delete-by-album-ids db image-repos album-ids)
-    (datum.album.repository:delete-albums db album-ids thumbnail-repos)))
+    (datum.album.db:delete-albums db album-ids thumbnail-repos)))
 
 
 
@@ -127,17 +145,3 @@
                  :name (album-name album)
                  :pictures (album-pictures container album)))
 
-
-(defstruct source name thumbnail updated-at)
-
-(defun create-albums (sources)
-  (let ((album-ids (mapcar (lambda (source)
-                             (datum.id:gen (source-name source)))
-                           sources)))
-    (mapcar (lambda (album-id source)
-              (datum.album.repository:make-album
-               :id album-id
-               :name (source-name source)
-               :updated-at (source-updated-at source)
-               :thumbnail (source-thumbnail source)))
-            album-ids sources)))

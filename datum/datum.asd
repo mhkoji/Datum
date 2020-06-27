@@ -5,24 +5,28 @@
   ((:file "id/uuid")
    ;(:file "id/sha256")
 
+   (:module :image
+    :pathname "image"
+    :components
+    ((:file "db")
+     (:file "image")))
+
    (:module :album
     :pathname "album"
     :components
     ((:file "thumbnail/thumbnail")
-     (:file "db/db")
-     (:file "repository")))
-
-   (:module :image
-    :pathname "image"
-    :components
-    ((:file "db/db")
-     (:file "image")))
+     (:file "thumbnail/entities")
+     (:file "pictures/db")
+     (:file "pictures/pictures")
+     (:file "db")
+     (:file "album")))
 
    (:module :tag
     :pathname "tag"
     :components
-    ((:file "db/db")
-     (:file "tag")))
+    ((:file "db")
+     (:file "tag")
+     (:file "contents")))
 
    (:file "stream")
 
@@ -35,27 +39,29 @@
    (:module :access-log
     :pathname "access-log"
     :components
-    ((:file "db/db")
-     (:file "access-log")))
+    ((:file "db")
+     (:file "access-log")
+     (:file "resources")))
 
-   (:file "db/db")
+   (:module :db
+    :pathname "db"
+    :components
+    ((:file "db")
+     (:module :mito
+      :pathname "mito"
+      :components
+      ((:file "mito")
+       (:file "album")
+       (:file "album-pictures")
+       (:file "image")
+       (:file "tag")
+       (:file "access-log")))))
 
-   (:file "album/pictures/db/db")
-   (:file "album/pictures/pictures")
-   (:file "album/album")
-   (:file "album/thumbnail/entities")
-   (:file "access-log/resources")
-
-   (:file "db/mito")
-   (:file "album/pictures/db/mito")
-   (:file "album/db/mito")
-   (:file "tag/contents")
-   (:file "image/db/mito")
-   (:file "tag/db/mito")
-   (:file "access-log/db/mito")
-
-   (:file "app/container")
-   (:file "app/app"))
+   (:module :app
+    :pathname "app"
+    :components
+    ((:file "container")
+     (:file "app"))))
 
   :depends-on (:babel
                :ironclad

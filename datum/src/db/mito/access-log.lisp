@@ -1,9 +1,9 @@
-(defpackage :datum.access-log.db.mito
+(defpackage :datum.db.mito.access-log
   (:use :cl :datum.access-log.db)
   (:export :access-log-record)
   (:import-from :dbi.driver
                 :<dbi-connection>))
-(in-package :datum.access-log.db.mito)
+(in-package :datum.db.mito.access-log)
 
 (defclass access-log-record (datum.db.mito:listed)
   ((resource-id :col-type (:varchar 256)

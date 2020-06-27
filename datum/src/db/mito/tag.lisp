@@ -1,10 +1,10 @@
-(defpackage :datum.tag.db.mito
+(defpackage :datum.db.mito.tag
   (:use :cl :datum.tag.db)
   (:export :tag
            :tag-content)
   (:import-from :dbi.driver
                 :<dbi-connection>))
-(in-package :datum.tag.db.mito)
+(in-package :datum.db.mito.tag)
 
 (defclass tag (datum.db.mito:listed)
   ((name :col-type (:varchar 256)

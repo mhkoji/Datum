@@ -13,7 +13,11 @@
 (defun load-by-album (db image-repos album)
   (let ((image-ids (datum.album.pictures.db:select-pictures
                     db (list (album-id album)))))
-    (datum.image:load-images-by-ids image-repos image-ids)))
+    (remove-duplicates ;; In case when datum.image dose not work correctly...
+     (datum.image:load-images-by-ids image-repos image-ids)
+     :test #'string=
+     :key (lambda (image)
+            (datum.id:to-string (datum.image:image-id image))))))
 
 (defun delete-by-album-ids (db image-repos album-ids)
   (datum.album.pictures.db:delete-pictures db album-ids)

@@ -1,10 +1,10 @@
-(defpackage :datum.album.db.mito
+(defpackage :datum.db.mito.album
   (:use :cl :datum.album.db)
   (:export :album
            :album-thumbnail)
   (:import-from :dbi.driver
                 :<dbi-connection>))
-(in-package :datum.album.db.mito)
+(in-package :datum.db.mito.album)
 
 (defclass album (datum.db.mito:listed)
   ((album-id :col-type (:varchar 256)

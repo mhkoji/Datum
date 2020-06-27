@@ -1,17 +1,50 @@
-(defpackage :datum.album.repository
-  (:use :cl :datum.album.db)
-  (:export :make-album
-           :save-albums
-           :load-albums
-           :delete-albums))
-(in-package :datum.album.repository)
+(defpackage :datum.album.db
+  (:use :cl)
+  (:export :make-album-row
+           :insert-album-rows
+           :select-album-rows
+           :select-album-ids
+           :select-album-ids-by-like
+           :delete-album-rows
+           :album-row-id
+           :album-row-name
+           :album-row-updated-at
 
-(defstruct album
+           :make-album-thumbnail-row
+           :insert-album-thumbnail-rows
+           :select-album-thumbnail-rows
+           :delete-album-thumbnail-rows
+           :album-thumbnail-row-album-id
+           :album-thumbnail-row-thumbnail-id
+
+           :load-albums-by-ids
+           :select-album-ids
+           :select-album-ids-by-like
+           :save-albums
+           :delete-albums))
+(in-package :datum.album.db)
+
+(defstruct album-row
   id
   name
-  updated-at
+  updated-at)
 
-  thumbnail)
+(defgeneric insert-album-rows (db rows))
+(defgeneric select-album-rows (db album-ids))
+(defgeneric select-album-ids (db offset count))
+(defgeneric select-album-ids-by-like (db name))
+(defgeneric delete-album-rows (db album-ids))
+
+
+(defstruct album-thumbnail-row
+  album-id
+  thumbnail-id)
+
+(defgeneric insert-album-thumbnail-rows (db rows))
+(defgeneric select-album-thumbnail-rows (db album-ids))
+(defgeneric delete-album-thumbnail-rows (db album-ids))
+
+;;;
 
 (defun album->album-row (album)
   (make-album-row :id (album-id album)
@@ -42,7 +75,7 @@
 (defun (setf id-gethash) (val id hash)
   (setf (gethash (datum.id:to-string id) hash) val))
 
-(defun load-albums (db ids thumbnail-repository)
+(defun load-albums-by-ids (db ids thumbnail-repository make-album-fn)
   (let ((album-id->args (make-id-hash-table)))
     (let ((rows (select-album-rows db ids)))
       (dolist (row rows)
@@ -66,7 +99,8 @@
           (alexandria:appendf (id-gethash album-id album-id->args)
            (list :thumbnail (id-gethash thumbnail-id id->thumbnail))))))
     (mapcar (lambda (album-id)
-              (apply #'make-album (id-gethash album-id album-id->args)))
+              (funcall make-album-fn
+                       (id-gethash album-id album-id->args)))
             ids)))
 
 
