@@ -1,7 +1,7 @@
 (ns datum.gui.pages.album
   (:require [clojure.repl :as repl]
             [reagent.core :as r]
-            [datum.album.api]
+            [datum.api.album]
             [datum.gui.controllers.show-album-overview
              :as show-album-overview]
             [datum.gui.controllers.edit-album-tags
@@ -16,7 +16,7 @@
    (header/get-state :album)
 
    :show-album-overview
-   (show-album-overview/Context.
+   (show-album-overview/->Context
     nil
 
     (reify show-album-overview/Transaction
@@ -25,15 +25,14 @@
 
     (reify show-album-overview/Api
       (show-album-overview/overview [_ id k]
-        (datum.album.api/overview id k)))
+        (datum.api.album/overview id k)))
 
     album-id)
 
    :edit-album-tags
-   (edit-album-tags/ClosedContext.
+   (edit-album-tags/->ClosedContext
     (fn [f]
-      (update-store #(update % :edit-album-tags f))))
-   })
+      (update-store #(update % :edit-album-tags f))))})
 
 (defn render [store elem]
   (r/render [datum.gui.pages.album.components/page store] elem))

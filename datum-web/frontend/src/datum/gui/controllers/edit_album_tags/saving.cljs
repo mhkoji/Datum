@@ -2,7 +2,7 @@
   (:require [reagent.core :as r]
             [datum.gui.components.loading :refer [spinner]]
             [cljs.core.async :refer [go <! timeout]]
-            [datum.album.api]))
+            [datum.api.album]))
 
 (defrecord Context [album-id attached-tags on-saved])
 
@@ -10,7 +10,7 @@
   ((:on-saved context)))
 
 (defn run [context]
-  (datum.album.api/put-tags (:album-id context)
+  (datum.api.album/put-tags (:album-id context)
                             (:attached-tags context)
    (fn []
      (go

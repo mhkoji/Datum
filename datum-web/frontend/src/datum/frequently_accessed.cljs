@@ -5,12 +5,12 @@
             [datum.album]))
 
 (defn obj->image [x]
-  (datum.image/Image. (x "image-id")))
+  (datum.image/->Image (x "image-id")))
 
 (defn obj->cover [x]
-  (datum.album/Cover. (x "album-id")
-                      (x "name")
-                      (obj->image (x "thumbnail"))))
+  (datum.album/->Cover (x "album-id")
+                       (x "name")
+                       (obj->image (x "thumbnail"))))
 
 (defn album-covers [k]
   (let [path (str "/frequently-accessed/album/covers")]

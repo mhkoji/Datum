@@ -1,6 +1,6 @@
 (ns datum.gui.controllers.edit-album-tags.editing
   (:require [datum.tag :as tag]
-            [datum.tag.api]))
+            [datum.api.tag]))
 
 (defrecord State [tags attached-tag-set new-name])
 
@@ -12,7 +12,7 @@
   ((-> context :state-container :update) f))
 
 (defn refresh-tags [context]
-  (datum.tag.api/tags
+  (datum.api.tag/tags
    (fn [tags] (update-state context #(assoc % :tags tags)))))
 
 (defn attach-tag [context tag]
@@ -23,7 +23,7 @@
 
 (defn delete-tag [context tag]
   (detach-tag context tag)
-  (datum.tag.api/delete-tag tag #(refresh-tags context)))
+  (datum.api.tag/delete-tag tag #(refresh-tags context)))
 
 
 (defn change-name [context name]
@@ -31,7 +31,7 @@
 
 (defn add-tag [context]
   (let [name (-> context :state-container :state :new-name)]
-    (datum.tag.api/put-tags name
+    (datum.api.tag/put-tags name
      (fn [_]
        (update-state context #(assoc % :new-name ""))
        (refresh-tags context)))))

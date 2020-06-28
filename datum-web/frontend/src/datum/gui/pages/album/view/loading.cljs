@@ -1,6 +1,6 @@
 (ns datum.gui.pages.album.view.loading
   (:require [reagent.core :as r]
-            [datum.album.api]
+            [datum.api.album]
             [datum.gui.components.header.state :as header]
             [datum.gui.components.header.reagent :refer [header-component]]))
 
@@ -13,7 +13,7 @@
     (update-context #(update % :state f))))
 
 (defn images [album-id k]
-  (datum.album.api/overview album-id #(k (-> % :pictures))))
+  (datum.api.album/overview album-id #(k (-> % :pictures))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

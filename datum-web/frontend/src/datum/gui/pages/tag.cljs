@@ -1,6 +1,6 @@
 (ns datum.gui.pages.tag
   (:require [reagent.core :as r]
-            [datum.tag.api]
+            [datum.api.tag]
             [datum.gui.controllers.show-tags :as show-tags]
             [datum.gui.controllers.show-album-covers :as show-album-covers]
             [datum.gui.components.header.state :as header]
@@ -40,8 +40,7 @@
         ;; covers
         [:main {:class "pt-3 px-4"}
          [:div {:class "container"}
-          [show-album-covers/component show-album-covers nil]]]]])
-    }))
+          [show-album-covers/component show-album-covers nil]]]]])}))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -58,7 +57,7 @@
         #(update-in % [:show-tags :state-container :state] f))))
     (reify show-tags/Api
       (show-tags/tags [_ k]
-        (datum.tag.api/tags k)))
+        (datum.api.tag/tags k)))
     tag-id)
 
    :show-album-covers
@@ -70,8 +69,7 @@
         #(update-in % [:show-album-covers :state-container :state] f))))
     (reify show-album-covers/Api
       (show-album-covers/covers [_ k]
-        (datum.tag.api/albums tag-id k))))
-   })
+        (datum.api.tag/albums tag-id k))))})
 
 
 (defn render [store elem]
@@ -79,5 +77,4 @@
 
 (defn render-loop [elem {:keys [tag-id]}]
   (util/render-loop {:create-store #(create-store % tag-id)
-                     :render       #(render % elem)
-                     }))
+                     :render       #(render % elem)}))

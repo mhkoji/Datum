@@ -16,7 +16,7 @@
   :cljsbuild
   {:builds
    {:dev
-    {:source-paths ["src/cljs/datum/"]
+    {:source-paths ["src/datum/"]
      :compiler {:output-to "resources/compiled/cljs/bundle.js"
                 :output-dir "resources/compiled/cljs/out"
                 :asset-path "/resources/compiled/cljs/out"
@@ -24,6 +24,6 @@
                 :main datum.gui.pages.main
                 :pretty-print true}}
     :prod
-    {:source-paths ["src/cljs/datum/"]
+    {:source-paths ["src/datum/"]
      :compiler {:output-to "resources/compiled/cljs/bundle.js"
                 :optimizations :advanced}}}})

@@ -1,7 +1,7 @@
 (ns datum.gui.pages.frequently-accessed
   (:require [reagent.core :as r]
-            [datum.tag.api]
             [datum.frequently-accessed]
+            [datum.api.tag]
             [datum.gui.components.header.state :as header]
             [datum.gui.components.header.reagent :refer [header-component]]
             [datum.gui.components.album :refer [covers-component]]
@@ -71,5 +71,4 @@
 
 (defn render-loop [elem _]
   (util/render-loop {:create-store #(create-truth %)
-                     :render       #(render % elem)
-                     }))
+                     :render       #(render % elem)}))

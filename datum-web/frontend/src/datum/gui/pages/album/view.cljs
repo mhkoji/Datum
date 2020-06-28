@@ -13,8 +13,8 @@
     (-> uri (.getQueryData) (.get "current"))))
 
 (defn single-context [update-store album-id images index]
-  (let [state (single/State. images index nil)]
-    (single/Context. state update-store album-id)))
+  (let [state (single/->State images index nil)]
+    (single/->Context state update-store album-id)))
 
 (defn loading-context [update-store album-id]
   (letfn [(handle-on-loaded [images]
@@ -25,7 +25,7 @@
                                              album-id
                                              images
                                              (or index-or-null 0)))))]
-    (loading/Context. nil update-store album-id handle-on-loaded)))
+    (loading/->Context nil update-store album-id handle-on-loaded)))
 
 
 (defmulti render

@@ -1,4 +1,4 @@
-(ns datum.album.api
+(ns datum.api.album
   (:require [cljs.core.async :refer [go <! pipe]]
             [ajax.core]
             [datum.api :as api]
@@ -7,13 +7,13 @@
             [datum.tag]))
 
 (defn obj->image [x]
-  (datum.image/Image. (x "image-id")))
+  (datum.image/->Image (x "image-id")))
 
 
 (defn obj->cover [x]
-  (datum.album/Cover. (x "album-id")
-                      (x "name")
-                      (obj->image (x "thumbnail"))))
+  (datum.album/->Cover (x "album-id")
+                       (x "name")
+                       (obj->image (x "thumbnail"))))
 
 (defn covers [offset count k]
   (let [path "/album/covers"
@@ -28,9 +28,9 @@
           (k (map obj->cover xs))))))
 
 (defn obj->overview [x]
-  (datum.album/Overview. (x "album-id")
-                         (x "name")
-                         (map obj->image (x "pictures"))))
+  (datum.album/->Overview (x "album-id")
+                          (x "name")
+                          (map obj->image (x "pictures"))))
 
 (defn overview [album-id k]
   (let [path (str "/album/" album-id "/overview")]
@@ -39,7 +39,7 @@
 
 
 (defn obj->tag [x]
-  (datum.tag/Tag. (str (x "tag-id")) (x "name")))
+  (datum.tag/->Tag (str (x "tag-id")) (x "name")))
 
 (defn tags [album-id k]
   (let [path (str "/album/" album-id "/tags")]

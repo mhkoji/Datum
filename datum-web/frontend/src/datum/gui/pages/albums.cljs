@@ -2,7 +2,7 @@
   (:require [cljs.reader :refer [read-string]]
             [reagent.core :as r]
             [goog.Uri :as guri]
-            [datum.album.api]
+            [datum.api.album]
             [datum.gui.controllers.search-albums :as search-albums]
             [datum.gui.controllers.show-album-covers :as show-album-covers]
             [datum.gui.controllers.edit-album-tags :as edit-album-tags]
@@ -16,7 +16,7 @@
    (header/get-state :album)
 
    :edit-album-tags
-   (edit-album-tags/ClosedContext.
+   (edit-album-tags/->ClosedContext
     (fn [f]
       (update! #(update % :edit-album-tags f))))
 
@@ -28,8 +28,7 @@
        (update!
         #(update-in % [:search-albums :state-container :state] f))))
     (fn [url]
-      (set! (.-location js/window) url)))
-   })
+      (set! (.-location js/window) url)))})
 
 (defn create-truth-covers [update! offset count]
   {:pager
@@ -47,8 +46,7 @@
         #(update-in % [:show-album-covers :state-container :state] f))))
     (reify show-album-covers/Api
       (show-album-covers/covers [_ k]
-        (datum.album.api/covers offset count k))))
-   })
+        (datum.api.album/covers offset count k))))})
 
 (defn create-truth-search [update! keyword]
   {:show-album-covers
@@ -60,8 +58,7 @@
         #(update-in % [:show-album-covers :state-container :state] f))))
     (reify show-album-covers/Api
       (show-album-covers/covers [_ k]
-        (datum.album.api/search keyword k))))
-   })
+        (datum.api.album/search keyword k))))})
 
 (defn render [truth elem]
   (r/render [datum.gui.pages.albums.components/page truth] elem))
