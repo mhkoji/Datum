@@ -6,6 +6,12 @@
                 :<dbi-connection>))
 (in-package :datum.db.mito.album)
 
+(defmacro conc-strings (&rest strings)
+  `(concatenate 'string ,@strings))
+
+(defun query (db sql params)
+  (dbi:fetch-all (apply #'dbi:execute (dbi:prepare db sql) params)))
+
 (defclass album (datum.db.mito:listed)
   ((album-id :col-type (:varchar 256)
              :accessor album-id)
@@ -26,21 +32,43 @@
 
 (defmethod select-album-rows ((db <dbi-connection>)
                               (album-ids list))
-  (let ((objects (mito:select-dao 'album
-                   (sxql:where (:in :album-id album-ids)))))
-    (mapcar (lambda (obj)
-              (make-album-row
-               :id (datum.id:from-string (album-id obj))
-               :name (album-name obj)
-               :updated-at (album-updated-at obj)))
-            objects)))
+  (when album-ids
+    (let ((sql (conc-strings
+                "SELECT *"
+                " FROM"
+                "  album"
+                " WHERE"
+                "  album_id in ("
+                (format nil "~{~A~^,~}"
+                        (loop repeat (length album-ids) collect "?"))
+                ")")))
+      (let ((plist-rows
+             (query db sql
+                    (mapcar #'datum.id:to-string album-ids))))
+        (mapcar (lambda (plist)
+                  (make-album-row
+                   :id (datum.id:from-string (getf plist :|album_id|))
+                   :name (getf plist :|name|)
+                   :updated-at (local-time:parse-timestring
+                                (getf plist :|updated_at|)
+                                :date-time-separator #\Space)))
+                plist-rows)))))
 
 (defmethod select-album-ids ((db <dbi-connection>)
                              offset count)
-  (mapcar (alexandria:compose #'datum.id:from-string #'album-id)
-          (mito:select-dao 'album
-            (sxql:order-by (:desc :updated_at))
-            (sxql:limit offset count))))
+  (let ((sql (conc-strings
+              "SELECT album_id"
+              " FROM"
+              "  album"
+              " ORDER BY"
+              "  updated_at DESC"
+              " LIMIT"
+              "  ?, ?")))
+    (let ((plist-rows
+           (query db sql (list offset count))))
+      (mapcar (lambda (plist)
+                (datum.id:from-string (getf plist :|album_id|)))
+              plist-rows))))
 
 (defmethod select-album-ids-by-like ((db <dbi-connection>)
                                      (name string))
