@@ -1,39 +1,54 @@
-(defpackage :datum.db.mito.image
-  (:use :cl)
-  (:export :image)
-  (:import-from :dbi.driver
-                :<dbi-connection>))
-(in-package :datum.db.mito.image)
-
-(defclass image (datum.db.mito:listed)
-  ((image-id :col-type (:varchar 256)
-             :accessor image-id)
-   (path :col-type (:varchar 256)
-         :accessor image-path))
-  (:metaclass mito:dao-table-class))
+(in-package :datum.db.mito)
 
 (defmethod datum.image.db:insert-images ((db <dbi-connection>)
                                          (images list))
-  (dolist (image images)
-    (mito:create-dao 'image
-                     :image-id (datum.id:to-string
+  (when images
+    (let ((sql (conc-strings
+                "INSERT INTO image"
+                " (image_id, path)"
+                " VALUES"
+                (format nil "~{~A~^,~}"
+                        (loop repeat (length images) collect "(?,?)")))))
+      (execute db sql (alexandria:mappend
+                       (lambda (image)
+                         (list (datum.id:to-string
                                 (datum.image:image-id image))
-                     :path (datum.image:image-path image))))
+                               (datum.image:image-path image)))
+                       images)))))
 
 (defmethod datum.image.db:select-images ((db <dbi-connection>)
                                          (image-ids list))
-  (let ((objects
-         (mito:select-dao 'image
-           (sxql:where
-            (:in :image-id (mapcar #'datum.id:to-string image-ids))))))
-    (mapcar (lambda (obj)
-              (datum.image:make-image
-               :id (datum.id:from-string (image-id obj))
-               :path (image-path obj)))
-            objects)))
+  (when image-ids
+    (let ((sql (conc-strings
+                "SELECT *"
+                " FROM"
+                "  image"
+                " WHERE"
+                "  image_id in"
+                " ("
+                (format nil "~{~A~^,~}"
+                        (loop repeat (length image-ids) collect "?"))
+                " )")))
+      (let ((plist-rows
+             (query db sql (mapcar #'datum.id:to-string image-ids))))
+        (mapcar (lambda (plist)
+                  (datum.image:make-image
+                   :id
+                   (datum.id:from-string (getf plist :|image_id|))
+                   :path (getf plist :|path|)))
+                plist-rows)))))
 
 (defmethod datum.image.db:delete-images ((db <dbi-connection>)
                                          (image-ids list))
-  (dolist (image-id image-ids)
-    (mito:delete-by-values 'image
-                           :image-id (datum.id:to-string image-id))))
+  (when image-ids
+    (let ((sql (conc-strings
+                "DELETE"
+                " FROM"
+                "  image"
+                " WHERE"
+                "  image_id in"
+                " ("
+                (format nil "~{~A~^,~}"
+                        (loop repeat (length image-ids) collect "?"))
+                " )")))
+      (execute db sql (mapcar #'datum.id:to-string image-ids)))))
