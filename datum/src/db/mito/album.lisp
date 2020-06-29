@@ -146,3 +146,55 @@
                         (loop repeat (length album-ids) collect "?"))
                 " )")))
       (execute db sql (mapcar #'datum.id:to-string album-ids)))))
+
+(defmethod datum.album.pictures.db:insert-pictures ((db <dbi-connection>)
+                                                    (album-id t)
+                                                    (picture-ids list))
+  (when picture-ids
+    (let ((sql (conc-strings
+                "INSERT INTO album_picture"
+                " (album_id, picture_id)"
+                " VALUES"
+                (format nil "~{~A~^,~}"
+                        (loop repeat (length picture-ids) collect "(?,?)"))))
+          (params
+           (alexandria:mappend
+            (lambda (picture-id)
+              (list (datum.id:to-string album-id)
+                    (datum.id:to-string picture-id)))
+            picture-ids)))
+      (execute db sql params))))
+
+(defmethod datum.album.pictures.db:select-pictures ((db <dbi-connection>)
+                                                    (album-ids list))
+  (when album-ids
+    (let ((sql (conc-strings
+                "SELECT *"
+                " FROM"
+                "  album_picture"
+                " WHERE"
+                "  album_id in"
+                " ("
+                (format nil "~{~A~^,~}"
+                        (loop repeat (length album-ids) collect "?"))
+                " )")))
+      (let ((plist-rows
+             (query db sql (mapcar #'datum.id:to-string album-ids))))
+        (mapcar (lambda (plist)
+                  (datum.id:from-string (getf plist :|picture_id|)))
+                plist-rows)))))
+
+(defmethod datum.album.pictures.db:delete-pictures ((db <dbi-connection>)
+                                                    (album-ids list))
+  (when album-ids
+    (let ((sql (conc-strings
+                "DELETE"
+                " FROM"
+                "  album_picture"
+                " WHERE"
+                "  album_id in"
+                " ("
+                (format nil "~{~A~^,~}"
+                        (loop repeat (length album-ids) collect "?"))
+                " )")))
+      (execute db sql (mapcar #'datum.id:to-string album-ids)))))

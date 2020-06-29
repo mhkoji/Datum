@@ -52,7 +52,6 @@
       :components
       ((:file "mito")
        (:file "album")
-       (:file "album-pictures")
        (:file "image")
        (:file "tag")
        (:file "access-log")))))

@@ -71,6 +71,13 @@
                  :accessor album-thumbnail-id))
   (:metaclass mito:dao-table-class))
 
+(defclass album-picture (listed)
+  ((album-id :col-type (:varchar 256)
+             :accessor album-id)
+   (picture-id :col-type (:varchar 256)
+               :accessor album-picture-id))
+  (:metaclass mito:dao-table-class))
+
 (defclass image (listed)
   ((image-id :col-type (:varchar 256)
              :accessor image-id)
