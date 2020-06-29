@@ -84,3 +84,13 @@
    (path :col-type (:varchar 256)
          :accessor image-path))
   (:metaclass mito:dao-table-class))
+
+(defclass access-log-record (listed)
+  ((resource-id :col-type (:varchar 256)
+                :accessor record-resource-id)
+   (resource-type :col-type (:varchar 256)
+                  :accessor record-resource-type)
+   (accessed-at :col-type :timestamp
+                :accessor record-accessed-at))
+  (:metaclass mito:dao-table-class)
+  (:record-timestamps nil))

@@ -1,39 +1,40 @@
-(defpackage :datum.db.mito.access-log
-  (:use :cl :datum.access-log.db)
-  (:export :access-log-record)
-  (:import-from :dbi.driver
-                :<dbi-connection>))
-(in-package :datum.db.mito.access-log)
+(in-package :datum.db.mito)
 
-(defclass access-log-record (datum.db.mito:listed)
-  ((resource-id :col-type (:varchar 256)
-                :accessor record-resource-id)
-   (resource-type :col-type (:varchar 256)
-                  :accessor record-resource-type)
-   (accessed-at :col-type :timestamp
-                :accessor record-accessed-at))
-  (:metaclass mito:dao-table-class)
-  (:record-timestamps nil))
+(defmethod datum.access-log.db:insert ((db <dbi-connection>)
+                                       resource
+                                       accessed-at)
+  (execute db
+           (conc-strings
+            "INSERT INTO access_log_record"
+            " (resource_id, resource_type, accessed_at)"
+            " VALUES"
+            " (?,?,?)")
+           (list (datum.id:to-string
+                  (datum.access-log.db:resource-id resource))
+                 (string-downcase
+                  (string (datum.access-log.db:resource-type resource)))
+                 (format-datetime accessed-at))))
 
-(defmethod insert ((db <dbi-connection>) resource accessed-at)
-  (mito:create-dao 'access-log-record
-                   :resource-id   (datum.id:to-string (resource-id resource))
-                   :resource-type (resource-type resource)
-                   :accessed-at   accessed-at))
-
-(defmethod count-accesses ((db <dbi-connection>) resource-type)
-  (let ((sxq (sxql:select (:resource_id
-                           (:as (:count :*) :count))
-               (sxql:from :access_log_record)
-               (sxql:where (:= :resource_type :?))
-               (sxql:group-by :resource_id)
-               (sxql:order-by (:desc :count)))))
-    (let* ((query (dbi:prepare db (sxql:yield sxq)))
-           (result (dbi:execute query (string-downcase
-                                       (string resource-type)))))
-      (loop for row = (dbi:fetch result)
-            while row
-            collect (make-access-count
-                     :resource-id (datum.id:from-string
-                                   (getf row :|resource_id|))
-                     :count (getf row :|count|))))))
+(defmethod datum.access-log.db:count-accesses ((db <dbi-connection>)
+                                               resource-type)
+  (let ((sql
+         (conc-strings
+          "SELECT resource_id, count(*) as count"
+          " FROM"
+          "  access_log_record"
+          " WHERE"
+          "  resource_type = ?"
+          " GROUP BY"
+          "  resource_id"
+          " ORDER BY"
+          "  count DESC"
+          " LIMIT 50")))
+    (let ((plist-rows
+           (query db sql (list (string-downcase
+                                (string resource-type))))))
+      (loop for row in plist-rows
+            collect (datum.access-log.db:make-access-count
+                     :resource-id
+                     (datum.id:from-string (getf row :|resource_id|))
+                     :count
+                     (getf row :|count|))))))
