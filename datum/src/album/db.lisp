@@ -17,6 +17,12 @@
            :album-thumbnail-row-album-id
            :album-thumbnail-row-thumbnail-id
 
+           :make-album
+           :album
+           :album-id
+           :album-name
+           :album-thumbnail
+
            :load-albums-by-ids
            :select-album-ids
            :select-album-ids-by-like
@@ -45,6 +51,12 @@
 (defgeneric delete-album-thumbnail-rows (db album-ids))
 
 ;;;
+
+(defstruct album
+  id
+  name
+  updated-at
+  thumbnail)
 
 (defun album->album-row (album)
   (make-album-row :id (album-id album)
@@ -75,7 +87,7 @@
 (defun (setf id-gethash) (val id hash)
   (setf (gethash (datum.id:to-string id) hash) val))
 
-(defun load-albums-by-ids (db ids thumbnail-repository make-album-fn)
+(defun load-albums-by-ids (db ids thumbnail-repository)
   (let ((album-id->args (make-id-hash-table)))
     (let ((rows (select-album-rows db ids)))
       (dolist (row rows)
@@ -99,8 +111,7 @@
           (alexandria:appendf (id-gethash album-id album-id->args)
            (list :thumbnail (id-gethash thumbnail-id id->thumbnail))))))
     (mapcar (lambda (album-id)
-              (funcall make-album-fn
-                       (id-gethash album-id album-id->args)))
+              (apply #'make-album (id-gethash album-id album-id->args)))
             ids)))
 
 

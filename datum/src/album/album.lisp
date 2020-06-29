@@ -35,14 +35,14 @@
 
            :make-source
            :create-albums
-           :save-albums))
+           :save-albums)
+  (:import-from :datum.album.db
+                :make-album
+                :album
+                :album-id
+                :album-name
+                :album-thumbnail))
 (in-package :datum.album)
-
-(defstruct album
-  id
-  name
-  updated-at
-  thumbnail)
 
 (defstruct source name thumbnail updated-at)
 
@@ -71,9 +71,7 @@
 (defun load-albums-by-ids (loader ids)
   (datum.album.db:load-albums-by-ids (loader-db loader)
                                      ids
-                                     (loader-thumbnail-repository loader)
-                                     (lambda (args)
-                                       (apply #'make-album args))))
+                                     (loader-thumbnail-repository loader)))
 
 (defun load-albums-by-range (loader offset count)
   (load-albums-by-ids
