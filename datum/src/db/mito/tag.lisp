@@ -1,82 +1,141 @@
-(defpackage :datum.db.mito.tag
-  (:use :cl :datum.tag.db)
-  (:export :tag
-           :tag-content)
-  (:import-from :dbi.driver
-                :<dbi-connection>))
-(in-package :datum.db.mito.tag)
+(in-package :datum.db.mito)
 
-(defclass tag (datum.db.mito:listed)
-  ((name :col-type (:varchar 256)
-         :accessor tag-name))
-  (:metaclass mito:dao-table-class))
+(labels ((to-tag-row (plist)
+           (datum.tag.db:make-tag-row
+            :tag-id
+            (getf plist :|id|)
+            :name
+            (getf plist :|name|))))
+  (defmethod datum.tag.db:select-tag-rows ((db <dbi-connection>)
+                                           offset
+                                           count)
+    (let ((sql (conc-strings
+                "SELECT *"
+                " FROM"
+                "  tag"
+                " LIMIT"
+                "  ?,?")))
+      (mapcar #'to-tag-row
+              (query db sql (list offset count)))))
 
-(defun dao->tag-row (obj)
-  (make-tag-row :tag-id (mito.dao.mixin:object-id obj)
-                :name (tag-name obj)))
-
-(defmethod select-tag-rows ((db <dbi-connection>) offset count)
-  (mapcar #'dao->tag-row
-          (mito:select-dao 'tag
-            (sxql:limit offset count))))
-
-(defmethod select-tag-rows-in ((db <dbi-connection>) (tag-ids list))
-  (mapcar #'dao->tag-row
-          (mito:select-dao 'tag
-            (sxql:where (:in :id tag-ids)))))
-
-(defmethod insert-tag-row ((db <dbi-connection>) name)
-  (dao->tag-row (mito:create-dao 'tag :name name)))
-
-(defmethod delete-tag-rows ((db <dbi-connection>) (tag-ids list))
-  (dolist (tag-id tag-ids)
-    (mito:delete-by-values 'tag :id tag-id)))
+  (defmethod datum.tag.db:select-tag-rows-in ((db <dbi-connection>)
+                                              (tag-ids list))
+    (when tag-ids
+      (let ((sql (conc-strings
+                  "SELECT *"
+                  " FROM"
+                  "  tag"
+                  " WHERE"
+                  "  id in"
+                  " ("
+                  (format nil "~{~A~^,~}"
+                          (loop repeat (length tag-ids) collect "?"))
+                  " )")))
+        (mapcar #'to-tag-row
+                (query db sql tag-ids)))))
 
 
-(defclass tag-content (datum.db.mito:listed)
-  ((tag-id :col-type (:varchar 256)
-           :accessor tag-content-tag-id)
-   (content-id :col-type (:varchar 256)
-               :accessor tag-content-content-id)
-   (content-type :col-type (:varchar 256)
-                 :accessor tag-content-content-type))
-  (:metaclass mito:dao-table-class))
+  (defmethod datum.tag.db:insert-tag-row ((db <dbi-connection>)
+                                          name)
+    (execute db
+             (conc-strings
+              "INSERT INTO tag"
+              " (name)"
+              "  VALUES"
+              " (?)")
+             (list name))
+    (let ((id (mito.db:last-insert-id db "tag" "id")))
+      (to-tag-row (list :|id| id :|name| name))))
 
-(defun dao->tag-content-row (obj)
-  (make-tag-content-row
-   :tag-id (tag-content-tag-id obj)
-   :content-id (datum.id:from-string (tag-content-content-id obj))
-   :content-type (string-upcase (tag-content-content-type obj))))
+  (defmethod datum.tag.db:select-tag-rows-by-content ((db <dbi-connection>)
+                                                      content-id)
+    (let ((sql (conc-strings
+                "SELECT *"
+                " FROM"
+                "  tag"
+                " INNER JOIN"
+                "  tag_content"
+                " ON"
+                "  tag.id = tag_content.tag_id"
+                " WHERE"
+                "  tag_content.content_id = ?")))
+      (mapcar #'to-tag-row
+              (query db sql (list (datum.id:to-string content-id)))))))
 
-(defmethod select-tag-rows-by-content ((db <dbi-connection>) content-id)
-  (mapcar #'dao->tag-row
-          (mito:select-dao 'tag
-            (sxql:inner-join :tag-content
-             :on (:= :tag.id :tag-content.tag-id))
-            (sxql:where
-             (:= :tag-content.content-id
-                 (datum.id:to-string content-id))))))
+(defmethod datum.tag.db:delete-tag-rows ((db <dbi-connection>)
+                                         (tag-ids list))
+  (when tag-ids
+    (let ((sql (conc-strings
+                "DELETE"
+                " FROM"
+                "  tag"
+                " WHERE"
+                "  id in"
+                " ("
+                (format nil "~{~A~^,~}"
+                        (loop repeat (length tag-ids) collect "?"))
+                " )")))
+      (execute db sql tag-ids))))
 
-(defmethod select-tag-content-rows ((db <dbi-connection>) tag-id)
-  (mapcar #'dao->tag-content-row
-          (mito:select-dao 'tag-content
-            (sxql:where (:= :tag-id tag-id)))))
 
-(defmethod insert-tag-content-rows ((db <dbi-connection>) (rows list))
-  (dolist (row rows)
-    (mito:create-dao 'tag-content
-                     :tag-id (tag-content-row-tag-id row)
-                     :content-id (datum.id:to-string
-                                  (tag-content-row-content-id row))
-                     :content-type (tag-content-row-content-type row))))
+(labels ((to-tag-content-rows (plist-rows)
+           (mapcar (lambda (plist)
+                     (datum.tag.db:make-tag-content-row
+                      :tag-id
+                      (getf plist :|tag_id|)
+                      :content-id
+                      (datum.id:from-string
+                       (getf plist :|content_id|))
+                      :content-type
+                      (string-upcase (getf plist :|content_type|))))
+                   plist-rows)))
+  (defmethod datum.tag.db:select-tag-content-rows ((db <dbi-connection>)
+                                                   tag-id)
+    (to-tag-content-rows
+     (query db
+            "SELECT * FROM tag_content WHERE tag_id = ?"
+            (list tag-id)))))
 
-(defmethod delete-tag-content-rows-by-tags ((db <dbi-connection>)
-                                            (tag-ids list))
-  (dolist (tag-id tag-ids)
-    (mito:delete-by-values 'tag-content :tag-id tag-id)))
+(defmethod datum.tag.db:insert-tag-content-rows ((db <dbi-connection>)
+                                                 (rows list))
+  (when rows
+    (execute db
+             (conc-strings
+              "INSERT INTO tag_content (tag_id, content_id, content_type)"
+              " VALUES"
+              (format nil "~{~A~^,~}"
+                      (loop repeat (length rows) collect "(?,?,?)")))
+             (alexandria:mappend
+              (lambda (row)
+                (list (datum.tag.db:tag-content-row-tag-id row)
+                      (datum.id:to-string
+                       (datum.tag.db:tag-content-row-content-id row))
+                      (string-downcase
+                       (string
+                        (datum.tag.db:tag-content-row-content-type row)))))
+              rows))))
 
-(defmethod delete-tag-content-rows-by-contents ((db <dbi-connection>)
-                                                (content-ids list))
-  (dolist (content-id content-ids)
-    (mito:delete-by-values 'tag-content
-                           :content-id (datum.id:to-string content-id))))
+(defmethod datum.tag.db:delete-tag-content-rows-by-tags ((db <dbi-connection>)
+                                                         (tag-ids list))
+  (when tag-ids
+    (execute db
+             (conc-strings
+              "DELETE FROM tag_content WHERE tag_id in"
+              " ("
+              (format nil "~{~A~^,~}"
+                      (loop repeat (length tag-ids) collect "?"))
+              " )")
+             tag-ids)))
+
+(defmethod datum.tag.db:delete-tag-content-rows-by-contents
+    ((db <dbi-connection>)
+     (content-ids list))
+  (when content-ids
+    (execute db
+             (conc-strings
+              "DELETE FROM tag_content WHERE content_id in"
+              " ("
+              (format nil "~{~A~^,~}"
+                      (loop repeat (length content-ids) collect "?"))
+              " )")
+             (mapcar #'datum.id:to-string content-ids))))

@@ -1,7 +1,6 @@
 (defpackage :datum.db.mito
   (:use :cl :datum.db)
-  (:export :mito-factory
-           :listed)
+  (:export :mito-factory)
   (:import-from :dbi.driver
                 :<dbi-connection>))
 (in-package :datum.db.mito)
@@ -55,42 +54,40 @@
 ;;;
 
 (defclass album (listed)
-  ((album-id :col-type (:varchar 256)
-             :accessor album-id)
-   (name :col-type (:varchar 256)
-         :accessor album-name)
-   (updated-at :col-type :timestamp
-               :accessor album-updated-at))
+  ((album-id :col-type (:varchar 256))
+   (name :col-type (:varchar 256))
+   (updated-at :col-type :timestamp))
   (:metaclass mito:dao-table-class)
   (:record-timestamps nil))
 
 (defclass album-thumbnail (listed)
-  ((album-id :col-type (:varchar 256)
-             :accessor album-id)
-   (thumbnail-id :col-type (:varchar 256)
-                 :accessor album-thumbnail-id))
+  ((album-id :col-type (:varchar 256))
+   (thumbnail-id :col-type (:varchar 256)))
   (:metaclass mito:dao-table-class))
 
 (defclass album-picture (listed)
-  ((album-id :col-type (:varchar 256)
-             :accessor album-id)
-   (picture-id :col-type (:varchar 256)
-               :accessor album-picture-id))
+  ((album-id :col-type (:varchar 256))
+   (picture-id :col-type (:varchar 256)))
   (:metaclass mito:dao-table-class))
 
 (defclass image (listed)
-  ((image-id :col-type (:varchar 256)
-             :accessor image-id)
-   (path :col-type (:varchar 256)
-         :accessor image-path))
+  ((image-id :col-type (:varchar 256))
+   (path :col-type (:varchar 256)))
   (:metaclass mito:dao-table-class))
 
 (defclass access-log-record (listed)
-  ((resource-id :col-type (:varchar 256)
-                :accessor record-resource-id)
-   (resource-type :col-type (:varchar 256)
-                  :accessor record-resource-type)
-   (accessed-at :col-type :timestamp
-                :accessor record-accessed-at))
+  ((resource-id :col-type (:varchar 256))
+   (resource-type :col-type (:varchar 256))
+   (accessed-at :col-type :timestamp))
   (:metaclass mito:dao-table-class)
   (:record-timestamps nil))
+
+(defclass tag (listed)
+  ((name :col-type (:varchar 256)))
+  (:metaclass mito:dao-table-class))
+
+(defclass tag-content (listed)
+  ((tag-id :col-type (:varchar 256))
+   (content-id :col-type (:varchar 256))
+   (content-type :col-type (:varchar 256)))
+  (:metaclass mito:dao-table-class))
