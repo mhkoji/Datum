@@ -28,7 +28,9 @@
   id
   name)
 
-(defgeneric content-id (content))
+(defgeneric content-id (content)
+  (:documentation
+   "This id must be an instance of the id class in the datum.id package."))
 
 (defgeneric content-type (content))
 
